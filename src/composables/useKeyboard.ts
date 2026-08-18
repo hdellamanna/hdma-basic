@@ -20,7 +20,8 @@ function dispatch(e: KeyboardEvent) {
     const h = list[i]
     if (h.key.toLowerCase() === e.key.toLowerCase()) {
       h.handler(e)
-      e.preventDefault()
+      // Only block default if the handler opted in via e.preventDefault()
+      if (e.defaultPrevented) return
       return
     }
   }

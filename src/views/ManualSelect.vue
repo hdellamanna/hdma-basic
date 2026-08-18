@@ -39,7 +39,7 @@ watch(manualId, (id) => arcade.selectManual(id))
 
 function playGame(gameId: string) {
   sfx.start()
-  router.push({ name: 'play', params: { id: gameId } })
+  router.push({ name: 'play', params: { manualId: manualId.value, gameId } })
 }
 
 function controlLabel(ctrl: string): string {

@@ -74,9 +74,10 @@ const locale = useLocaleStore()
 const arcade = useArcadeStore()
 const { sfx } = useAudio()
 
-const gameId = computed(() => String(route.params.id || ''))
-const game = computed(() => GAMES.find((g) => g.id === gameId.value) ?? null)
-const manual = computed(() => MANUALS.find((m) => m.id === game.value?.manualId) ?? null)
+const manualId = computed(() => String(route.params.manualId || ''))
+const gameId = computed(() => String(route.params.gameId || ''))
+const game = computed(() => GAMES.find((g) => g.id === gameId.value && g.manualId === manualId.value) ?? null)
+const manual = computed(() => MANUALS.find((m) => m.id === manualId.value) ?? null)
 
 const gameMap: Record<string, any> = {
   'haunted-house': HauntedHouse,

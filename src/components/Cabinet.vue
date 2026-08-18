@@ -49,6 +49,11 @@ const accentClass = computed(() => {
   >
     <!-- Marquee (top) -->
     <div class="cabinet-marquee mb-2 ring-1 ring-surface-600">
+      <span
+        v-if="props.manual.id.endsWith('-pt')"
+        class="absolute left-1.5 top-1.5 z-10 font-display text-[8px] tracking-widest px-1.5 py-0.5 rounded bg-amber/15 text-amber ring-1 ring-amber/40"
+        title="Editora Lutécia — edição brasileira"
+      >BR</span>
       <div class="absolute inset-0 flex items-center justify-center px-3">
         <span class="font-display text-[9px] tracking-widest truncate" :class="accentClass.text">
           {{ titleKey }}
