@@ -51,7 +51,7 @@ const accentClass = computed(() => {
     <div class="cabinet-marquee mb-2 ring-1 ring-surface-600">
       <span
         v-if="props.manual.id.endsWith('-pt')"
-        class="absolute left-1.5 top-1.5 z-10 font-display text-[8px] tracking-widest px-1.5 py-0.5 rounded bg-amber/15 text-amber ring-1 ring-amber/40"
+        class="absolute right-1.5 top-1.5 z-10 font-display text-[9px] font-bold tracking-widest px-2 py-0.5 rounded bg-amber text-void-deep ring-1 ring-amber shadow-[0_0_8px_rgba(255,176,0,0.6)]"
         title="Editora Lutécia — edição brasileira"
       >BR</span>
       <div class="absolute inset-0 flex items-center justify-center px-3">
