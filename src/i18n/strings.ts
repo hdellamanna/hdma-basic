@@ -16,12 +16,12 @@ export const LOCALE_FLAGS: Record<Locale, string> = {
 // UI strings shared across the app
 export const UI_STRINGS: Record<string, Record<Locale, string>> = {
   appName: {
-    'pt-BR': 'msx.dellamanna.org',
-    en: 'msx.dellamanna.org',
+    'pt-BR': 'basic.dellamanna.org',
+    en: 'basic.dellamanna.org',
   },
   appTagline: {
-    'pt-BR': 'HDMA MLogo Era · O arcade dos manuais Usborne (1982–1985)',
-    en: 'HDMA MLogo Era · The Usborne manuals arcade (1982–1985)',
+    'pt-BR': 'HDMA BASIC · 59 programas reconstruídos dos manuais Usborne, Apple ][ e Logo',
+    en: 'HDMA BASIC · 59 programs reconstructed from Usborne books, Apple ][ and Logo',
   },
   chooseCabinet: {
     'pt-BR': 'ESCOLHA UM ARCADE',

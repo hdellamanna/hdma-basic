@@ -46,6 +46,7 @@ export type GameGenre =
   | 'simulation'     // landing, takeoff
   | 'horror'         // horror book games
   | 'fantasy'        // rpg/dungeon
+  | 'creative'       // turtle graphics, generative art
 
 export type ManualId =
   | 'adventure-1983'
@@ -56,6 +57,7 @@ export type ManualId =
   | 'horror-pt'
   | 'msx-pt'
   | 'spy-pt'
+  | 'apple-logo'
 
 export interface Manual {
   id: ManualId

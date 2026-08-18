@@ -1,7 +1,8 @@
 import type { GameManifest } from '../types'
 
 /**
- * All 51 games reconstructed from the 7 Usborne / Editora Lutécia manuals.
+ * All 59 games reconstructed from the 8 Usborne / Editora Lutícia manuals
+ * + Apple Logo (turtle graphics interpreter).
  * Each game ships a bilingual title, description, objective and instructions.
  * The actual game logic lives in src/games/<Id>.vue
  */
@@ -1497,6 +1498,36 @@ export const GAMES: GameManifest[] = [
         instructions:
           'The computer shows a letter in Morse (· and –). Click the matching letter. Then you decode full words.',
         controlsHint: 'Click the correct letter',
+      },
+    },
+  },
+
+  // =================== APPLE LOGO (1) ===================
+  {
+    id: 'apple-logo',
+    manualId: 'apple-logo',
+    year: 1985,
+    difficulty: 2,
+    genre: 'creative',
+    controls: 'typing',
+    avgDurationSec: 600,
+    isTextHeavy: true,
+    i18n: {
+      'pt-BR': {
+        title: 'Apple Logo',
+        shortDesc: 'Linguagem Logo completa com turtle graphics, REPEAT, procedures e variáveis.',
+        objective: 'Programar a tartaruga para desenhar formas geométricas, fractais e arte generativa.',
+        instructions:
+          'Digite comandos Logo: FD n (avança), BK n (recua), RT n (direita), LT n (esquerda), PU/PD (caneta), REPEAT n [ ... ], TO nome :a END (define procedure), MAKE "x v (variável). ↑/↓ navega histórico. EXEMPLOS carrega programas prontos.',
+        controlsHint: 'Digite comandos + ENTER · ↑↓ histórico',
+      },
+      en: {
+        title: 'Apple Logo',
+        shortDesc: 'Full Logo language with turtle graphics, REPEAT, procedures and variables.',
+        objective: 'Program the turtle to draw geometric shapes, fractals and generative art.',
+        instructions:
+          'Type Logo commands: FD n (forward), BK n (back), RT n (right), LT n (left), PU/PD (pen), REPEAT n [ ... ], TO name :a END (define procedure), MAKE "x v (variable). ↑/↓ navigates history. EXAMPLES loads preset programs.',
+        controlsHint: 'Type commands + ENTER · ↑↓ history',
       },
     },
   },

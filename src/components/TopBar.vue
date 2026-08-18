@@ -40,11 +40,11 @@ function onMute() {
         @click="sfx.select()"
       >
         <span class="relative inline-block h-7 w-7 sm:h-8 sm:w-8">
-          <span class="absolute inset-0 rounded bg-phosphor-green/20 animate-glow"></span>
-          <span class="absolute inset-0 grid place-items-center font-display text-base phosphor">M</span>
+          <span class="absolute inset-0 rounded bg-phosphor/20 animate-glow"></span>
+          <span class="absolute inset-0 grid place-items-center font-display text-base phosphor">B</span>
         </span>
         <span class="flex flex-col leading-tight">
-          <span class="phosphor text-shadow-neon group-hover:animate-flicker">msx.dellamanna.org</span>
+          <span class="phosphor text-shadow-neon group-hover:animate-flicker">HDMA BASIC</span>
           <span class="text-[9px] sm:text-[10px] text-ink-muted tracking-normal normal-case">
             {{ t('appTagline', locale.current) }}
           </span>
@@ -104,8 +104,8 @@ function onMute() {
     <div class="overflow-hidden border-t border-surface-700 bg-void-deep">
       <div class="cabinet-marquee">
         <div class="absolute inset-y-0 flex items-center gap-12 px-6 animate-marquee whitespace-nowrap text-[10px] font-display tracking-widest text-ink-muted">
-          <span>★ INSERT COIN ★ {{ arcade.totalGames }} GAMES ★ {{ arcade.totalManuals }} MANUALS ★ 1982–1985 ★ USBORNE & EDITORA LUTÉCIA ★</span>
-          <span>★ INSERT COIN ★ {{ arcade.totalGames }} GAMES ★ {{ arcade.totalManuals }} MANUALS ★ 1982–1985 ★ USBORNE & EDITORA LUTÉCIA ★</span>
+          <span>★ HDMA BASIC ★ {{ arcade.totalGames }} GAMES ★ {{ arcade.totalManuals }} MANUALS ★ 1982–1985 ★ APPLE ][ · USBORNE · EDITORA LUTÉCIA ★</span>
+          <span>★ HDMA BASIC ★ {{ arcade.totalGames }} GAMES ★ {{ arcade.totalManuals }} MANUALS ★ 1982–1985 ★ APPLE ][ · USBORNE · EDITORA LUTÉCIA ★</span>
         </div>
       </div>
     </div>

@@ -177,4 +177,26 @@ export const MANUALS: Manual[] = [
       },
     },
   },
+  {
+    id: 'apple-logo',
+    pdfPath: '',
+    year: 1985,
+    accent: 'amber',
+    publisher: 'Apple Computer · Logo Computer Systems Inc.',
+    authors: ['Seymour Papert', 'Cynthia Solomon', 'Brian Harvey'],
+    i18n: {
+      'pt-BR': {
+        title: 'APPLE LOGO',
+        subtitle: 'Apple Logo II / LogoWriter · 1985',
+        blurb:
+          'A linguagem de programação que ensinou uma geração a programar através de uma tartaruga. FD, BK, RT, LT, REPEAT, procedures, variáveis, recursão. Apple Logo II (1984) e LogoWriter (1985) — os dois sistemas que popularizaram Logo no Apple II. Implementei um interpretador completo com turtle rendering, REPEAT, TO/END, MAKE, IF, recursão e 5 programas de exemplo (quadrado, estrela, espiral, flor, árvore fractal).',
+      },
+      en: {
+        title: 'APPLE LOGO',
+        subtitle: 'Apple Logo II / LogoWriter · 1985',
+        blurb:
+          'The programming language that taught a generation to code through a turtle. FD, BK, RT, LT, REPEAT, procedures, variables, recursion. Apple Logo II (1984) and LogoWriter (1985) — the two systems that popularized Logo on the Apple II. I built a full interpreter with turtle rendering, REPEAT, TO/END, MAKE, IF, recursion and 5 example programs (square, star, spiral, flower, fractal tree).',
+      },
+    },
+  },
 ]

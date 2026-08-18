@@ -35,7 +35,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: hdma-mlogo-era
+          projectName: hdma-basic
           directory: dist
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           # Optional: branch preview

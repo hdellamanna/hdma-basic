@@ -67,6 +67,7 @@ import TesteEspioes from '../games/spy/TesteEspioes.vue'
 import GeradorMensagens from '../games/spy/GeradorMensagens.vue'
 import EncontroMarcado from '../games/spy/EncontroMarcado.vue'
 import CodigoMorse from '../games/spy/CodigoMorse.vue'
+import AppleLogo from '../games/logo/Logo.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -138,6 +139,7 @@ const gameMap: Record<string, any> = {
   'gerador-mensagens': GeradorMensagens,
   'encontro-marcado': EncontroMarcado,
   'codigo-morse': CodigoMorse,
+  'apple-logo': AppleLogo,
 }
 
 const GameComponent = computed(() => gameMap[gameId.value] ?? null)

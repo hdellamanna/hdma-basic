@@ -5,35 +5,42 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Phosphor arcade palette - real black + neon, no warm/cream AI default
+        // Apple ][ palette — beige + phosphor green
         void: {
-          DEFAULT: '#050507',
-          deep: '#000000',
+          DEFAULT: '#0a1808',
+          deep: '#020602',
         },
         phosphor: {
-          green: '#39ff14',
-          dim: '#1f7a0a',
+          green: '#4fff4f',
+          dim: '#2a8a2a',
           ghost: '#0a2a04',
         },
         amber: {
           DEFAULT: '#ffb000',
           dim: '#a06d00',
         },
-        magenta: '#ff00ff',
-        cyan: '#00f0ff',
-        danger: '#ff2d2d',
-        // Soft UI layers (true black + dark grays, not warm cream)
+        magenta: '#ff44ff',
+        cyan: '#44e0ff',
+        danger: '#ff4444',
+        // Apple ][ beige
+        beige: {
+          DEFAULT: '#d6cfb8',
+          dim: '#b8b094',
+          dark: '#8a8470',
+          darker: '#4a4630',
+        },
+        // Soft UI layers — true black + dark warm grays
         surface: {
-          900: '#0a0a0d',
-          800: '#111115',
-          700: '#16161c',
-          600: '#1d1d24',
-          500: '#26262e',
+          900: '#1a1814',
+          800: '#222018',
+          700: '#2a2820',
+          600: '#3a3628',
+          500: '#4a4630',
         },
         ink: {
-          DEFAULT: '#e8e8ec',
-          muted: '#9a9aa3',
-          dim: '#5a5a64',
+          DEFAULT: '#cfd2c4',
+          muted: '#9a9a8a',
+          dim: '#5a5a4a',
         },
       },
       fontFamily: {
