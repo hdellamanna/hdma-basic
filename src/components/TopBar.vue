@@ -44,7 +44,7 @@ function onMute() {
           <span class="absolute inset-0 grid place-items-center font-display text-base phosphor">M</span>
         </span>
         <span class="flex flex-col leading-tight">
-          <span class="phosphor text-shadow-neon group-hover:animate-flicker">HDMA · MLogo Era</span>
+          <span class="phosphor text-shadow-neon group-hover:animate-flicker">msx.dellamanna.org</span>
           <span class="text-[9px] sm:text-[10px] text-ink-muted tracking-normal normal-case">
             {{ t('appTagline', locale.current) }}
           </span>

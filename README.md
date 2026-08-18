@@ -1,17 +1,19 @@
-# HDMA MLogo Era
+# msx.dellamanna.org
 
 > Um arcade virtual com **51 jogos** clássicos reconstruídos em JavaScript a partir dos **7 manuais Usborne** (1982–1985), incluindo as edições brasileiras da Editora Lutécia. Tudo jogável no navegador, com **i18n PT-BR + EN** completo.
 
-![HDMA MLogo Era](https://img.shields.io/badge/games-51-39ff14?style=for-the-badge)
-![HDMA MLogo Era](https://img.shields.io/badge/manuals-7-ffb000?style=for-the-badge)
-![HDMA MLogo Era](https://img.shields.io/badge/years-1982--1985-ff00ff?style=for-the-badge)
-![HDMA MLogo Era](https://img.shields.io/badge/i18n-PT--BR%20%2B%20EN-00f0ff?style=for-the-badge)
+**Live:** [msx.dellamanna.org](https://msx.dellamanna.org/) · [hdma-mlogo-era.pages.dev](https://hdma-mlogo-era.pages.dev/) (mirror)
+
+![msx.dellamanna.org](https://img.shields.io/badge/games-51-39ff14?style=for-the-badge)
+![msx.dellamanna.org](https://img.shields.io/badge/manuals-7-ffb000?style=for-the-badge)
+![msx.dellamanna.org](https://img.shields.io/badge/years-1982--1985-ff00ff?style=for-the-badge)
+![msx.dellamanna.org](https://img.shields.io/badge/i18n-PT--BR%20%2B%20EN-00f0ff?style=for-the-badge)
 
 ## 🎮 What is this
 
 The Usborne Publishing manuals (`Computer Space Games`, `Computer Battle Games`, `Weird Computer Games`, `Write Your Own Adventure Programs`, `Fantasy Games`, plus the Brazilian `Programas de Jogos de Horror` and `Livro de Jogos em MSX`) taught a whole generation to program BASIC on micros like the ZX81, BBC Micro, ZX Spectrum, TRS-80, MSX, VIC-20 and Apple II.
 
-**HDMA MLogo Era** brings them all to the browser with:
+**HDMA MLogo Era** (published at `msx.dellamanna.org`) brings them all to the browser with:
 
 - **51 playable games** in the browser
 - **7 manuals** available for download (PDF)
@@ -22,7 +24,7 @@ The Usborne Publishing manuals (`Computer Space Games`, `Computer Battle Games`,
 
 ## 🕹 The arcade
 
-Visit the site. You'll see 7 arcade cabinets lined up like a 1980s game room. Click any one to open its game picker. Each cabinet has a unique cover SVG drawn from scratch — no AI art, no stock photos.
+Visit [msx.dellamanna.org](https://msx.dellamanna.org/). You'll see 7 arcade cabinets lined up like a 1980s game room. Click any one to open its game picker. Each cabinet has a unique cover SVG drawn from scratch — no AI art, no stock photos.
 
 ## 📚 The manuals
 
@@ -61,9 +63,15 @@ npm run build
 npm run preview
 ```
 
+## 🌐 Deploy
+
+Cloudflare Pages, project `hdma-mlogo-era`, custom domain `msx.dellamanna.org`.
+GitHub Actions workflow at `.github/workflows/deploy.yml` triggers on push to `main`.
+DNS for `msx.dellamanna.org` is a CNAME → `hdma-mlogo-era.pages.dev` (DNS-only, no proxy — Cloudflare Pages validates via CNAME).
+
 ## 🎯 The name
 
-`HDMA` = Henrique Della Manna Arcade. `MLogo Era` = the era of the educational Logo/MSX/BBC micro computers of the early 80s.
+`HDMA` = Henrique Della Manna Arcade. `MLogo Era` = the era of the educational Logo/MSX/BBC micro computers of the early 80s. `msx.dellamanna.org` is the published hostname under `dellamanna.org`.
 
 ## ⚖ Credits
 
