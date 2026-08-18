@@ -60,6 +60,13 @@ import Labirinto3D from '../games/msx/Labirinto3D.vue'
 import Damas from '../games/msx/Damas.vue'
 import Xadrez from '../games/msx/Xadrez.vue'
 import Gustavus from '../games/msx/Gustavus.vue'
+import OlhosEspiao from '../games/spy/OlhosEspiao.vue'
+import Holofote from '../games/spy/Holofote.vue'
+import Espiobot from '../games/spy/Espiobot.vue'
+import TesteEspioes from '../games/spy/TesteEspioes.vue'
+import GeradorMensagens from '../games/spy/GeradorMensagens.vue'
+import EncontroMarcado from '../games/spy/EncontroMarcado.vue'
+import CodigoMorse from '../games/spy/CodigoMorse.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -123,6 +130,13 @@ const gameMap: Record<string, any> = {
   'damas': Damas,
   'xadrez': Xadrez,
   'gustavus': Gustavus,
+  'olhos-espiao': OlhosEspiao,
+  'holofote': Holofote,
+  'espiobot': Espiobot,
+  'teste-espioes': TesteEspioes,
+  'gerador-mensagens': GeradorMensagens,
+  'encontro-marcado': EncontroMarcado,
+  'codigo-morse': CodigoMorse,
 }
 
 const GameComponent = computed(() => gameMap[gameId.value] ?? null)

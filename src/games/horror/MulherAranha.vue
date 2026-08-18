@@ -27,33 +27,57 @@ function start() {
 
 function submit() {
   if (status.value !== 'playing') return
-  const w = input.value.trim().toLowerCase()
-  if (w.length < 4 || w.length > 8) {
-    log.value.push(locale.current === 'pt-BR' ? '✗ Palavra deve ter 4-8 letras' : '✗ Word must be 4-8 letters')
-    sfx.error()
-    input.value = ''
-    return
-  }
+  // Normalize: trim, strip internal spaces, uppercase, strip accents
+  const norm = (s: string) =>
+    s.trim().replace(/\s+/g, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase()
+  const raw = norm(input.value)
+  if (!raw) return
+  sfx.type()
+  // Guess mode: expect a single letter
   if (canGuess.value) {
-    if (w.toUpperCase() === target.value) {
+    if (raw.length !== 1 || !/[A-Z]/.test(raw)) {
+      log.value.push(locale.current === 'pt-BR'
+        ? '✗ Palpite = 1 única letra A-Z. SKIP para outra palavra.'
+        : '✗ Guess = 1 letter A-Z only. SKIP for another word.')
+      sfx.error()
+      input.value = ''
+      return
+    }
+    if (raw === target.value) {
       status.value = 'won'
       sfx.win()
       log.value.push(`★ ${target.value}`)
     } else {
       tries.value -= 5
-      log.value.push(locale.current === 'pt-BR' ? `✗ era ${target.value}` : `✗ was ${target.value}`)
-      status.value = 'lost'
-      sfx.lose()
+      log.value.push(locale.current === 'pt-BR' ? `✗ Era ${target.value}` : `✗ Was ${target.value}`)
+      if (tries.value <= 0) {
+        status.value = 'lost'
+        sfx.lose()
+      }
     }
+    input.value = ''
     return
   }
-  if (w.toUpperCase().includes(target.value)) {
+  // Word mode: 4-8 letters, must contain target
+  if (raw.length < 4 || raw.length > 8) {
+    log.value.push(locale.current === 'pt-BR'
+      ? `✗ "${raw}" deve ter 4-8 letras (sem contar espaços/acentos)`
+      : `✗ "${raw}" must be 4-8 letters (ignoring spaces/accents)`)
+    sfx.error()
+    input.value = ''
+    return
+  }
+  if (raw.includes(target.value)) {
     canGuess.value = true
-    log.value.push(locale.current === 'pt-BR' ? `✓ Contém ${target.value}. Palpite (S/N)?` : `✓ Contains ${target.value}. Guess (Y/N)?`)
+    log.value.push(locale.current === 'pt-BR'
+      ? `✓ "${raw}" contém ${target.value}. Palpite (1 letra) ou SKIP.`
+      : `✓ "${raw}" contains ${target.value}. Guess (1 letter) or SKIP.`)
     sfx.powerup()
   } else {
     tries.value--
-    log.value.push(locale.current === 'pt-BR' ? `✗ Não contém` : `✗ Doesn't contain`)
+    log.value.push(locale.current === 'pt-BR'
+      ? `✗ "${raw}" não contém a letra ${target.value}`
+      : `✗ "${raw}" doesn't contain the letter ${target.value}`)
     sfx.error()
   }
   if (tries.value <= 0) {

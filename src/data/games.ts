@@ -1308,6 +1308,198 @@ export const GAMES: GameManifest[] = [
       },
     },
   },
+
+  // =================== ESPIONAGEM PT (7) ===================
+  {
+    id: 'olhos-espiao',
+    manualId: 'spy-pt',
+    year: 1984,
+    difficulty: 2,
+    genre: 'puzzle',
+    controls: 'click',
+    avgDurationSec: 120,
+    i18n: {
+      'pt-BR': {
+        title: 'Olhos de Espião',
+        shortDesc: 'Memorize a posição de 9 números. Um muda. Qual?',
+        objective: 'Acertar 5 rodadas seguidas.',
+        instructions:
+          'Memorize os 9 números na tela. Aperte qualquer tecla. Um número muda de posição. Aperte de novo uma tecla e entre com o número (1-9) que se moveu.',
+        controlsHint: 'Clique ou tecla para revelar · 1-9 para responder',
+      },
+      en: {
+        title: 'Spy Eyes',
+        shortDesc: 'Memorize 9 numbers. One moves. Which?',
+        objective: 'Get 5 in a row.',
+        instructions:
+          'Memorize 9 numbers on screen. Press any key. One number moves. Press a key again and enter the number (1-9) that moved.',
+        controlsHint: 'Click or key to reveal · 1-9 to answer',
+      },
+    },
+  },
+  {
+    id: 'holofote',
+    manualId: 'spy-pt',
+    year: 1984,
+    difficulty: 3,
+    genre: 'action',
+    controls: 'click',
+    avgDurationSec: 120,
+    i18n: {
+      'pt-BR': {
+        title: 'Holofote',
+        shortDesc: 'Atravesse o território inimigo sem ser pego pelo holofote.',
+        objective: 'Cruzar o terreno ida e volta antes do holofote te pegar.',
+        instructions:
+          'Mova com M (direita) e N (esquerda). Esconda-se atrás de árvores (=) e pedras. O holofote acende/apaga em ciclos. Cruze ida e volta. Quantas missões aguenta?',
+        controlsHint: 'N = esquerda · M = direita',
+      },
+      en: {
+        title: 'Spotlight',
+        shortDesc: 'Cross enemy territory without being caught by the spotlight.',
+        objective: 'Cross the terrain there and back before the spotlight catches you.',
+        instructions:
+          'Move with M (right) and N (left). Hide behind trees (=) and rocks. The spotlight cycles on/off. Cross there and back. How many missions can you last?',
+        controlsHint: 'N = left · M = right',
+      },
+    },
+  },
+  {
+    id: 'espiobot',
+    manualId: 'spy-pt',
+    year: 1984,
+    difficulty: 3,
+    genre: 'puzzle',
+    controls: 'click',
+    avgDurationSec: 180,
+    i18n: {
+      'pt-BR': {
+        title: 'Espiobot',
+        shortDesc: 'Siga a sequência de direções (E/D) que o agente inimigo fez.',
+        objective: 'Acertar a sequência mais longa possível sem errar.',
+        instructions:
+          'O computador mostra uma sequência de direções (ESQ/DIR). Decore. Depois entre com a mesma sequência. Aumenta a cada 5 rodadas. Use D = direita, E = esquerda.',
+        controlsHint: 'D = direita · E = esquerda',
+      },
+      en: {
+        title: 'Spybot',
+        shortDesc: 'Follow the sequence of directions (L/R) the enemy agent took.',
+        objective: 'Match the longest sequence without an error.',
+        instructions:
+          'The computer shows a sequence of directions (L/R). Memorize. Then enter the same sequence. Length grows every 5 rounds. Use D = right, E = left.',
+        controlsHint: 'D = right · E = left',
+      },
+    },
+  },
+  {
+    id: 'teste-espioes',
+    manualId: 'spy-pt',
+    year: 1984,
+    difficulty: 3,
+    genre: 'puzzle',
+    controls: 'typing',
+    avgDurationSec: 240,
+    i18n: {
+      'pt-BR': {
+        title: 'Teste para Espiões',
+        shortDesc: 'Coloque 10 números em ordem do menor para o maior.',
+        objective: 'Subir de Espião Aprendiz Nível 5 até Superespião.',
+        instructions:
+          'Em cada rodada, 10 posições vazias. Receba um número (1-99). Coloque na posição certa (1-10) para manter a ordem crescente. D = descartar (você tem D descartes por nível).',
+        controlsHint: 'Digite 1-10 para posição · D = descartar',
+      },
+      en: {
+        title: 'Spy Test',
+        shortDesc: 'Place 10 numbers in order from smallest to largest.',
+        objective: 'Climb from Trainee Spy Level 5 to Superspy.',
+        instructions:
+          'Each round has 10 empty slots. You get a number (1-99). Place it in the right slot (1-10) to keep ascending order. D = discard (you get D discards per level).',
+        controlsHint: 'Type 1-10 for slot · D = discard',
+      },
+    },
+  },
+  {
+    id: 'gerador-mensagens',
+    manualId: 'spy-pt',
+    year: 1984,
+    difficulty: 2,
+    genre: 'puzzle',
+    controls: 'typing',
+    avgDurationSec: 180,
+    i18n: {
+      'pt-BR': {
+        title: 'Decodificador de Mensagens Secretas',
+        shortDesc: 'Codifique e decodifique mensagens com cifra de César.',
+        objective: 'Praticar a Rede de Espionagem.',
+        instructions:
+          '1 = Codificar: entre com a mensagem, veja o código (letras deslocadas + invertidas + pares trocados). 2 = Decodificar: cole o código e receba a mensagem original.',
+        controlsHint: '1 = codificar · 2 = decodificar · digite a mensagem',
+      },
+      en: {
+        title: 'Secret Message Coder',
+        shortDesc: 'Encode and decode messages with a Caesar cipher.',
+        objective: 'Practice for the Spy Network.',
+        instructions:
+          '1 = Encode: type a message, see the code (letters shifted + reversed + pairs swapped). 2 = Decode: paste the code, get the original message.',
+        controlsHint: '1 = encode · 2 = decode · type your message',
+      },
+    },
+  },
+  {
+    id: 'encontro-marcado',
+    manualId: 'spy-pt',
+    year: 1984,
+    difficulty: 4,
+    genre: 'adventure',
+    controls: 'typing',
+    avgDurationSec: 600,
+    isTextHeavy: true,
+    i18n: {
+      'pt-BR': {
+        title: 'Encontro Marcado',
+        shortDesc: 'Aventura: pegue a maleta, ache a chave, entregue ao contato antes do último voo.',
+        objective: 'Completar a missão de espionagem antes do último voo.',
+        instructions:
+          'Use 2 palavras: IR [lugar], SEGUIR [espião], EXAMINAR, DIZER [senha], LER, ABRIR [número], DEIXAR [mensagem], ESPERAR [min], HORA. Encontre a chave (examine inimigos), descubra a senha, e encontre o contato no horário.',
+        controlsHint: '2 palavras por comando · ENTER',
+      },
+      en: {
+        title: 'Dead Drop',
+        shortDesc: 'Adventure: get the briefcase, find the key, deliver to the contact before the last flight.',
+        objective: 'Complete the spy mission before the last flight.',
+        instructions:
+          'Use 2-word commands: GO [place], FOLLOW [spy], EXAMINE, SAY [password], READ, OPEN [number], LEAVE [message], WAIT [min], TIME. Find the key (examine enemies), learn the password, find the contact on time.',
+        controlsHint: '2 words per command · ENTER',
+      },
+    },
+  },
+  {
+    id: 'codigo-morse',
+    manualId: 'spy-pt',
+    year: 1984,
+    difficulty: 2,
+    genre: 'puzzle',
+    controls: 'click',
+    avgDurationSec: 180,
+    i18n: {
+      'pt-BR': {
+        title: 'Código Morse',
+        shortDesc: 'Decodifique e transmita mensagens em código Morse.',
+        objective: 'Acertar 10 mensagens seguidas.',
+        instructions:
+          'O computador mostra uma letra em Morse (· e –). Clique na letra correspondente. Depois você decodifica palavras inteiras.',
+        controlsHint: 'Clique na letra correta',
+      },
+      en: {
+        title: 'Morse Code',
+        shortDesc: 'Decode and transmit messages in Morse code.',
+        objective: 'Get 10 messages in a row.',
+        instructions:
+          'The computer shows a letter in Morse (· and –). Click the matching letter. Then you decode full words.',
+        controlsHint: 'Click the correct letter',
+      },
+    },
+  },
 ]
 
 export function getGame(id: string): GameManifest | undefined {

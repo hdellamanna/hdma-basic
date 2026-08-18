@@ -55,6 +55,7 @@ export type ManualId =
   | 'weird-1984'
   | 'horror-pt'
   | 'msx-pt'
+  | 'spy-pt'
 
 export interface Manual {
   id: ManualId

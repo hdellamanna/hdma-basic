@@ -155,4 +155,26 @@ export const MANUALS: Manual[] = [
       },
     },
   },
+  {
+    id: 'spy-pt',
+    pdfPath: '/pdfs/Programas_de_Jogos_de_Espionagem_text.pdf',
+    year: 1984,
+    accent: 'cyan',
+    publisher: 'Editora Lutécia (Brasil)',
+    authors: ['Jenny Tyler', 'Chris Oxlade'],
+    i18n: {
+      'pt-BR': {
+        title: 'PROGRAMAS DE JOGOS DE ESPIONAGEM',
+        subtitle: 'Computer Spy Games · 1984 (BR)',
+        blurb:
+          'A edição brasileira do Computer Spy Games. Memorize 9 números em Olhos de Espião, atravesse o território inimigo no Holofote, controle o Espiobot, passe no Teste para Espiões, codifique mensagens secretas, faça o Encontro Marcado (dead drop) e decifre Código Morse.',
+      },
+      en: {
+        title: 'COMPUTER SPY GAMES',
+        subtitle: '1984 (Brazilian edition)',
+        blurb:
+          'The Brazilian edition of Computer Spy Games. Memorize 9 numbers in Spy Eyes, cross enemy territory in the Spotlight, control the Spybot, pass the Spy Test, encode secret messages, make the Dead Drop and decode Morse code.',
+      },
+    },
+  },
 ]

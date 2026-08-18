@@ -283,9 +283,15 @@ function findObjectIdx(name: string): number {
 }
 
 function hasObject(name: string): boolean {
-  const idx = findObjectIdx(name)
-  if (idx === -1) return false
-  return inventory.value.includes(obj.value[idx].name[locale.current])
+  // Check by PT/EN name OR by id (chave/key, vela/candle, fosforo/match, espada/sword, machado/axe)
+  const r = locale.current
+  for (let i = 0; i < obj.value.length; i++) {
+    const n = obj.value[i].name[r].toLowerCase()
+    if (n === name || n.startsWith(name) || name.startsWith(n)) {
+      return inventory.value.includes(obj.value[i].name[r])
+    }
+  }
+  return false
 }
 
 function lookAround() {
@@ -339,11 +345,11 @@ function move(dirKey: 'n'|'s'|'e'|'w'|'u'|'d') {
     return
   }
   // Special locked doors
-  if (currentRoom.value === 1 && target === 2 && !hasObject('chave')) {
+  if (currentRoom.value === 1 && target === 2 && !hasObject(locale.current === 'pt-BR' ? 'chave' : 'key')) {
     logMsg(locale.current === 'pt-BR' ? 'A porta está trancada.' : 'The door is locked.', 'text-danger')
     return
   }
-  if (currentRoom.value === 24 && target === 25 && !hasObject('chave')) {
+  if (currentRoom.value === 24 && target === 25 && !hasObject(locale.current === 'pt-BR' ? 'chave' : 'key')) {
     logMsg(locale.current === 'pt-BR' ? 'O cofre está trancado.' : 'The safe is locked.', 'text-danger')
     return
   }
@@ -451,15 +457,15 @@ function examineItem(name: string) {
 
 function openItem(name: string) {
   if (gameOver.value) return
-  if (currentRoom.value === 24 && (name === 'cofre' || name === 'safe')) {
-    if (hasObject('chave')) {
+  if (currentRoom.value === 24 && (name.includes('cofre') || name.includes('safe'))) {
+    if (hasObject(locale.current === 'pt-BR' ? 'chave' : 'key')) {
       logMsg(locale.current === 'pt-BR' ? 'Você abre o cofre. Está vazio agora.' : 'You open the safe. It is empty now.', 'text-amber')
     } else {
       logMsg(locale.current === 'pt-BR' ? 'O cofre está trancado. Precisa de uma chave.' : 'The safe is locked. You need a key.', 'text-danger')
     }
     return
   }
-  if (currentRoom.value === 20 && (name === 'frasco' || name === 'potion' || name === 'poção')) {
+  if (currentRoom.value === 20 && (name.includes('frasco') || name.includes('potion') || name.includes('poção'))) {
     if (inventory.value.includes(obj.value[7].name[locale.current])) {
       logMsg(locale.current === 'pt-BR' ? 'O frasco está aberto. Você sente um cheiro forte.' : 'The jar is open. You smell a strong odor.', 'text-cyan')
     } else {
@@ -472,7 +478,7 @@ function openItem(name: string) {
 
 function lightItem(name: string) {
   if (gameOver.value) return
-  if ((name === 'vela' || name === 'candle') && hasObject('vela') && hasObject('fósforo')) {
+  if ((name.includes('vela') || name.includes('candle')) && hasObject(locale.current === 'pt-BR' ? 'vela' : 'candle') && hasObject(locale.current === 'pt-BR' ? 'fósforo' : 'match')) {
     if (!hasLight.value) {
       hasLight.value = true
       sfx.start()
@@ -487,8 +493,8 @@ function lightItem(name: string) {
 
 function killTarget(name: string) {
   if (gameOver.value) return
-  if ((name === 'cobra' || name === 'snake') && currentRoom.value === 17) {
-    if (hasObject('espada') || hasObject('machado')) {
+  if ((name.includes('cobra') || name.includes('snake')) && currentRoom.value === 17) {
+    if (hasObject(locale.current === 'pt-BR' ? 'espada' : 'sword') || hasObject(locale.current === 'pt-BR' ? 'machado' : 'axe')) {
       snakeAlive.value = false
       sfx.hit()
       logMsg(locale.current === 'pt-BR' ? 'Você mata a cobra. A saída está livre.' : 'You kill the snake. The exit is clear.', 'text-amber')
@@ -499,7 +505,7 @@ function killTarget(name: string) {
     return
   }
   if ((name === 'fantasma' || name === 'ghost') && currentRoom.value === 11) {
-    if (hasObject('espelho')) {
+    if (hasObject(locale.current === 'pt-BR' ? 'espelho' : 'mirror')) {
       ghostsBanished.value = true
       sfx.powerup()
       logMsg(locale.current === 'pt-BR' ? 'Os fantasmas se vêem no espelho e somem!' : 'The ghosts see themselves in the mirror and vanish!', 'text-amber')
@@ -510,7 +516,7 @@ function killTarget(name: string) {
     return
   }
   if ((name === 'morcego' || name === 'bat') && currentRoom.value === 6) {
-    if (hasObject('machado')) {
+    if (hasObject(locale.current === 'pt-BR' ? 'machado' : 'axe')) {
       batDisturbed.value = true
       logMsg(locale.current === 'pt-BR' ? 'Você espanta os morcegos.' : 'You scare the bats away.', 'text-ink-muted')
     } else {
@@ -524,7 +530,7 @@ function killTarget(name: string) {
 
 function drinkItem(name: string) {
   if (gameOver.value) return
-  if ((name === 'poção' || name === 'potion') && hasObject('poção')) {
+  if ((name.includes('poção') || name.includes('potion')) && hasObject(locale.current === 'pt-BR' ? 'poção' : 'potion')) {
     drankPotion.value = true
     sfx.powerup()
     logMsg(locale.current === 'pt-BR' ? 'Você bebe a poção. Tudo brilha.' : 'You drink the potion. Everything glows.', 'text-cyan')
