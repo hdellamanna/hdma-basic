@@ -104,8 +104,8 @@ function onMute() {
     <div class="overflow-hidden border-t border-surface-700 bg-void-deep">
       <div class="cabinet-marquee">
         <div class="absolute inset-y-0 flex items-center gap-12 px-6 animate-marquee whitespace-nowrap text-[10px] font-display tracking-widest text-ink-muted">
-          <span>★ INSERT COIN ★ 51 GAMES ★ 7 MANUALS ★ 1982–1985 ★ USBORNE & EDITORA LUTÉCIA ★</span>
-          <span>★ INSERT COIN ★ 51 GAMES ★ 7 MANUALS ★ 1982–1985 ★ USBORNE & EDITORA LUTÉCIA ★</span>
+          <span>★ INSERT COIN ★ {{ arcade.totalGames }} GAMES ★ {{ arcade.totalManuals }} MANUALS ★ 1982–1985 ★ USBORNE & EDITORA LUTÉCIA ★</span>
+          <span>★ INSERT COIN ★ {{ arcade.totalGames }} GAMES ★ {{ arcade.totalManuals }} MANUALS ★ 1982–1985 ★ USBORNE & EDITORA LUTÉCIA ★</span>
         </div>
       </div>
     </div>
