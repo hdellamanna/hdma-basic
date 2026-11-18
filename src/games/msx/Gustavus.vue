@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
 import { useAudio } from '../../composables/useAudio'
+import { useRoundTimer } from '../../composables/useRoundTimer'
 import CrtFrame from '../../components/CrtFrame.vue'
 
 const router = useRouter()
@@ -16,8 +17,10 @@ const boxes = ref<string[][]>([])
 const turn = ref<'P' | 'A'>('P')
 const scores = ref({ P: 0, A: 0 })
 const status = ref<'playing' | 'won' | 'lost'>('playing')
+const { schedule, cancel } = useRoundTimer()
 
 function start() {
+  cancel()
   horiz.value = Array(SIZE).fill(null).map(() => Array(SIZE - 1).fill(false))
   vert.value = Array(SIZE - 1).fill(null).map(() => Array(SIZE).fill(false))
   boxes.value = Array(SIZE - 1).fill(null).map(() => Array(SIZE - 1).fill(null))
@@ -40,9 +43,10 @@ function placeH(r: number, c: number) {
   if (turn.value !== 'P') return
   horiz.value[r][c] = true
   sfx.tick()
-  finish()
-  turn.value = 'A'
-  setTimeout(aiMove, 300)
+  if (!finish() && status.value === 'playing') {
+    turn.value = 'A'
+    schedule(aiMove, 300)
+  }
 }
 
 function placeV(r: number, c: number) {
@@ -51,9 +55,10 @@ function placeV(r: number, c: number) {
   if (turn.value !== 'P') return
   vert.value[r][c] = true
   sfx.tick()
-  finish()
-  turn.value = 'A'
-  setTimeout(aiMove, 300)
+  if (!finish() && status.value === 'playing') {
+    turn.value = 'A'
+    schedule(aiMove, 300)
+  }
 }
 
 function finish() {
@@ -73,17 +78,12 @@ function finish() {
   if (scores.value.P + scores.value.A >= totalBoxes) {
     status.value = scores.value.P > scores.value.A ? 'won' : 'lost'
     if (status.value === 'won') sfx.win(); else sfx.lose()
-    return
   }
-  if (made) {
-    // Same player plays again
-    if (turn.value === 'A') setTimeout(aiMove, 300)
-  }
+  return made
 }
 
 function aiMove() {
-  if (status.value !== 'playing') return
-  // Simple: pick first available
+  if (status.value !== 'playing' || turn.value !== 'A') return
   const options: { r: number; c: number; dir: 'h' | 'v' }[] = []
   for (let r = 0; r < SIZE; r++) {
     for (let c = 0; c < SIZE - 1; c++) {
@@ -96,30 +96,25 @@ function aiMove() {
     }
   }
   if (options.length === 0) return
-  // Prefer non-completing moves (avoid gifting boxes)
-  const safe = options.filter((o) => {
-    if (o.dir === 'h') {
-      horiz.value[o.r][o.c] = true
-    } else {
-      vert.value[o.r][o.c] = true
-    }
-    let createsBox = false
-    for (let r = 0; r < SIZE - 1; r++) {
-      for (let c = 0; c < SIZE - 1; c++) {
-        if (!boxes.value[r][c] && horiz.value[r][c] && horiz.value[r + 1][c] && vert.value[r][c] && vert.value[r][c + 1]) {
-          createsBox = true
-        }
-      }
-    }
-    if (o.dir === 'h') horiz.value[o.r][o.c] = false
-    else vert.value[o.r][o.c] = false
-    return !createsBox
+  function wouldCloseBox(r: number, c: number) {
+    if (r < 0 || r >= SIZE - 1 || c < 0 || c >= SIZE - 1 || boxes.value[r][c]) return false
+    return [
+      horiz.value[r][c], horiz.value[r + 1][c],
+      vert.value[r][c], vert.value[r][c + 1],
+    ].filter(Boolean).length === 3
+  }
+  const scoring = options.filter(({ dir, r, c }) => {
+    const adjacent = dir === 'h' ? [r - 1, c] : [r, c - 1]
+    return wouldCloseBox(r, c) || wouldCloseBox(adjacent[0], adjacent[1])
   })
-  const choice = (safe.length > 0 ? safe : options)[Math.floor(Math.random() * (safe.length > 0 ? safe.length : options.length))]
+  const choices = scoring.length ? scoring : options
+  const choice = choices[Math.floor(Math.random() * choices.length)]
   if (choice.dir === 'h') horiz.value[choice.r][choice.c] = true
   else vert.value[choice.r][choice.c] = true
-  finish()
-  if (status.value === 'playing') turn.value = 'P'
+  const made = finish()
+  if (status.value !== 'playing') return
+  if (made) schedule(aiMove, 300)
+  else turn.value = 'P'
 }
 
 function onQuit() { router.push('/') }

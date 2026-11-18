@@ -30,6 +30,7 @@ let lastSpawn = 0
 let frame: number | null = null
 
 function start() {
+  if (frame !== null) cancelAnimationFrame(frame)
   witch.value = { x: 5, y: 0 }
   ingredients.value = []
   collected.value = []
@@ -101,7 +102,7 @@ function onKey(e: KeyboardEvent) {
 onMounted(() => window.addEventListener('keydown', onKey))
 onUnmounted(() => {
   window.removeEventListener('keydown', onKey)
-  if (frame) cancelAnimationFrame(frame)
+  if (frame !== null) cancelAnimationFrame(frame)
 })
 
 function onQuit() { router.push('/') }

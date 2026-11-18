@@ -16,13 +16,14 @@ const bullets = ref<{ x: number; y: number; vx: number }[]>([])
 const enemyBullets = ref<{ x: number; y: number }[]>([])
 const score = ref(0)
 const lives = ref(3)
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 let lastShot = 0
 let lastEnemy = 0
 let dir = 1
 let frame: number | null = null
 
 function start() {
+  if (frame !== null) cancelAnimationFrame(frame)
   shipX.value = W / 2
   bullets.value = []
   enemyBullets.value = []
@@ -128,7 +129,7 @@ function onKey(e: KeyboardEvent) {
 onMounted(() => window.addEventListener('keydown', onKey))
 onUnmounted(() => {
   window.removeEventListener('keydown', onKey)
-  if (frame) cancelAnimationFrame(frame)
+  if (frame !== null) cancelAnimationFrame(frame)
 })
 
 function onQuit() { router.push('/') }
@@ -143,7 +144,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="invaders.length === 0" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'Space Invaders estilo anos 80. Setas + ESPAÇO.' : '80s Space Invaders. Arrows + SPACE.' }}
       </p>

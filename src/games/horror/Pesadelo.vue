@@ -13,7 +13,7 @@ const score = ref(300)
 const target = ref(0)
 const input = ref('')
 const log = ref<string[]>([])
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 let timer: number | null = null
 
 const INSULTS = computed(() => {
@@ -92,7 +92,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="score === 300 && log.length === 0 && status === 'playing'" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'O computador te insulta. Repita os números. Chegue a 500 antes de cair a 0.' : 'The computer insults you. Repeat the numbers. Reach 500 before dropping to 0.' }}
       </p>

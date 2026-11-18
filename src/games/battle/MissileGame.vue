@@ -14,11 +14,12 @@ const cannonX = ref(W / 2)
 const missiles = ref<{ x: number; y: number }[]>([])
 const interceptions = ref<{ x: number; y: number; vx: number; vy: number }[]>([])
 const score = ref(0)
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 let frame: number | null = null
 let lastSpawn = 0
 
 function start() {
+  if (frame !== null) cancelAnimationFrame(frame)
   cannonX.value = W / 2
   missiles.value = []
   interceptions.value = []
@@ -78,7 +79,7 @@ function onKey(e: KeyboardEvent) {
 onMounted(() => window.addEventListener('keydown', onKey))
 onUnmounted(() => {
   window.removeEventListener('keydown', onKey)
-  if (frame) cancelAnimationFrame(frame)
+  if (frame !== null) cancelAnimationFrame(frame)
 })
 
 function onQuit() { router.push('/') }
@@ -92,7 +93,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="missiles.length === 0 && score === 0 && status === 'playing'" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'Intercepte 10 mísseis. Setas + ESPAÇO.' : 'Intercept 10 missiles. Arrows + SPACE.' }}
       </p>

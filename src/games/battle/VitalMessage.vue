@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
 import { useAudio } from '../../composables/useAudio'
+import { useRoundTimer } from '../../composables/useRoundTimer'
 import CrtFrame from '../../components/CrtFrame.vue'
 
 const router = useRouter()
@@ -15,14 +16,17 @@ const phase = ref<'pick' | 'show' | 'recall'>('pick')
 const input = ref('')
 const status = ref<'playing' | 'won' | 'lost'>('playing')
 
+const { schedule } = useRoundTimer()
+
 function start() {
+  status.value = 'playing'
   let m = ''
   for (let i = 0; i < difficulty.value; i++) m += String.fromCharCode(65 + Math.floor(Math.random() * 26))
   message.value = m
   input.value = ''
   phase.value = 'show'
   sfx.start()
-  setTimeout(() => {
+  schedule(() => {
     phase.value = 'recall'
   }, Math.max(1500, difficulty.value * 800))
 }

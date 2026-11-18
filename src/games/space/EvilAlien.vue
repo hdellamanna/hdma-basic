@@ -14,7 +14,7 @@ const x = ref(0); const y = ref(0); const d = ref(0)
 const xi = ref(''); const yi = ref(''); const di = ref('')
 const bombs = ref(4)
 const log = ref<string[]>([])
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 
 function start() {
   x.value = Math.floor(Math.random() * s.value)
@@ -68,7 +68,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="bombs === 4 && log.length === 0" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR'
           ? 'Elron está em um grid 3D. Você tem 4 bombas. Mate-o!'

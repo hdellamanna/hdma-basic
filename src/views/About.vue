@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useLocaleStore } from '../stores/locale'
 import { useArcadeStore } from '../stores/arcade'
@@ -7,6 +8,8 @@ import { useAudio } from '../composables/useAudio'
 
 const locale = useLocaleStore()
 const arcade = useArcadeStore()
+const games = computed(() => arcade.games.filter((game) => game.manualId !== 'apple-logo').length)
+const manuals = computed(() => arcade.manuals.filter((manual) => manual.pdfPath).length)
 const { sfx } = useAudio()
 </script>
 
@@ -26,16 +29,16 @@ const { sfx } = useAudio()
 
     <article class="prose-custom space-y-4 text-sm leading-relaxed text-ink">
       <p v-if="locale.current === 'pt-BR'">
-        <strong class="phosphor">HDMA MLogo Era</strong> é um arcade virtual com
-        <strong>{{ arcade.totalGames }} jogos</strong> reconstruídos em JavaScript a partir
-        de <strong>{{ arcade.totalManuals }} manuais clássicos da Usborne Publishing</strong>
+        <strong class="phosphor">HDMA BASIC</strong> é um arcade virtual com
+        <strong>{{ games }} jogos</strong> reconstruídos em JavaScript a partir
+        de <strong>{{ manuals }} manuais clássicos da Usborne Publishing</strong>
         ({{ arcade.yearSpan }}), incluindo as edições brasileiras da Editora Lutécia.
         Tudo jogável no navegador, em PT-BR e EN.
       </p>
       <p v-else>
-        <strong class="phosphor">HDMA MLogo Era</strong> is a virtual arcade with
-        <strong>{{ arcade.totalGames }} games</strong> rebuilt in JavaScript from
-        <strong>{{ arcade.totalManuals }} classic Usborne Publishing manuals</strong>
+        <strong class="phosphor">HDMA BASIC</strong> is a virtual arcade with
+        <strong>{{ games }} games</strong> rebuilt in JavaScript from
+        <strong>{{ manuals }} classic Usborne Publishing manuals</strong>
         ({{ arcade.yearSpan }}), including the Brazilian editions by Editora Lutécia.
         All playable in the browser, in PT-BR and EN.
       </p>
@@ -45,14 +48,14 @@ const { sfx } = useAudio()
         ZX81, BBC Micro, ZX Spectrum, TRS-80, MSX, VIC-20 e Apple II. Cada programa
         era escrito em uma variante de BASIC, com conversões marcadas por símbolos
         (<code>●</code> Apple, <code>◆</code> BBC, <code>§</code> Spectrum, <code>■</code> TRS-80, <code>▲</code> C64).
-        Aqui, todos eles ganham uma vida nova em canvas, com sons 8-bit e controles modernos.
+        A edição clássica traz os jogos em TypeScript para o navegador, com sons de 8 bits.
       </p>
       <p v-else>
         The Usborne manuals taught a whole generation to program BASIC on micros like the
         ZX81, BBC Micro, ZX Spectrum, TRS-80, MSX, VIC-20 and Apple II. Each program was
         written in a BASIC dialect, with conversions marked by symbols
         (<code>●</code> Apple, <code>◆</code> BBC, <code>§</code> Spectrum, <code>■</code> TRS-80, <code>▲</code> C64).
-        Here, they all get a new life on canvas, with 8-bit sounds and modern controls.
+        The classic edition brings the games to the browser in TypeScript with 8-bit sounds.
       </p>
 
       <h2 class="font-display text-sm text-amber mt-6">
@@ -60,22 +63,22 @@ const { sfx } = useAudio()
       </h2>
       <ul class="list-none space-y-1 text-sm">
         <li v-if="locale.current === 'pt-BR'">
-          <strong class="phosphor">{{ arcade.totalGames }} jogos</strong> — todos reconstruídos, todos jogáveis.
+          <strong class="phosphor">{{ games }} jogos</strong> e uma oficina de programação em Logo.
         </li>
         <li v-else>
-          <strong class="phosphor">{{ arcade.totalGames }} games</strong> — all reconstructed, all playable.
+          <strong class="phosphor">{{ games }} games</strong> and a Logo programming workshop.
         </li>
         <li v-if="locale.current === 'pt-BR'">
-          <strong class="phosphor">{{ arcade.totalManuals }} manuais</strong> disponíveis para download (PDF).
+          <strong class="phosphor">{{ manuals }} manuais</strong> disponíveis para download (PDF).
         </li>
         <li v-else>
-          <strong class="phosphor">{{ arcade.totalManuals }} manuals</strong> available for download (PDF).
+          <strong class="phosphor">{{ manuals }} manuals</strong> available for download (PDF).
         </li>
         <li v-if="locale.current === 'pt-BR'">
-          <strong class="phosphor">i18n completo</strong> PT-BR + EN, com troca instantânea.
+          <strong class="phosphor">Interface bilíngue</strong> PT-BR + EN, com troca instantânea.
         </li>
         <li v-else>
-          <strong class="phosphor">Full i18n</strong> PT-BR + EN, instant toggle.
+          <strong class="phosphor">Bilingual interface</strong> PT-BR + EN, instant toggle.
         </li>
         <li v-if="locale.current === 'pt-BR'">
           <strong class="phosphor">Sons 8-bit</strong> gerados em tempo real com Web Audio.

@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
 import { useAudio } from '../../composables/useAudio'
+import { useRoundTimer } from '../../composables/useRoundTimer'
 import CrtFrame from '../../components/CrtFrame.vue'
 
 const router = useRouter()
@@ -16,6 +17,7 @@ const selected = ref<{ r: number; c: number } | null>(null)
 const validMoves = ref<{ r: number; c: number }[]>([])
 const log = ref<string[]>([])
 const status = ref<'playing' | 'won' | 'lost'>('playing')
+const { schedule, cancel } = useRoundTimer()
 
 function initBoard() {
   const empty: (Piece | null)[][] = Array(8).fill(null).map(() => Array(8).fill(null))
@@ -30,6 +32,7 @@ function initBoard() {
 }
 
 function start() {
+  cancel()
   board.value = initBoard()
   turn.value = 'w'
   selected.value = null
@@ -113,7 +116,7 @@ function isInCheck(color: 'w' | 'b') {
 }
 
 function select(r: number, c: number) {
-  if (status.value !== 'playing') return
+  if (status.value !== 'playing' || turn.value !== 'w') return
   const p = board.value[r][c]
   if (p && p.color === turn.value) {
     selected.value = { r, c }
@@ -142,14 +145,15 @@ function move(mv: { r: number; c: number }) {
   selected.value = null
   validMoves.value = []
   turn.value = turn.value === 'w' ? 'b' : 'w'
-  if (turn.value === 'b') setTimeout(aiMove, 500)
   // Check checkmate
   if (!findKing('w')) { status.value = 'lost'; sfx.lose(); return }
   if (!findKing('b')) { status.value = 'won'; sfx.win(); return }
   if (isInCheck(turn.value)) log.value.push(locale.current === 'pt-BR' ? '⚠ Xeque!' : '⚠ Check!')
+  if (turn.value === 'b') schedule(aiMove, 500)
 }
 
 function aiMove() {
+  if (status.value !== 'playing' || turn.value !== 'b') return
   const allMoves: { from: { r: number; c: number }; mv: { r: number; c: number } }[] = []
   for (let r = 0; r < 8; r++) {
     for (let c = 0; c < 8; c++) {
@@ -168,7 +172,7 @@ function aiMove() {
   const choice = allMoves[Math.floor(Math.random() * allMoves.length)]
   selected.value = choice.from
   validMoves.value = getMoves(choice.from.r, choice.from.c)
-  setTimeout(() => move(choice.mv), 200)
+  move(choice.mv)
 }
 
 const PIECE_GLYPH: Record<string, string> = {
@@ -195,8 +199,18 @@ function load() {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
       const data = JSON.parse(raw)
+      if (!Array.isArray(data.board) || data.board.length !== 8
+        || !data.board.every((row: unknown) => Array.isArray(row) && row.length === 8
+          && row.every((piece) => piece === null || ((piece?.color === 'w' || piece?.color === 'b')
+            && ['p', 'n', 'b', 'r', 'q', 'k'].includes(piece?.type))))
+        || (data.turn !== 'w' && data.turn !== 'b')) return
+      cancel()
       board.value = data.board
       turn.value = data.turn
+      selected.value = null
+      validMoves.value = []
+      status.value = 'playing'
+      if (turn.value === 'b') schedule(aiMove, 500)
       log.value.push(locale.current === 'pt-BR' ? '↻ Carregado' : '↻ Loaded')
     }
   } catch {}
@@ -212,7 +226,7 @@ function load() {
   >
     <div v-if="board.length === 0" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
-        {{ locale.current === 'pt-BR' ? 'Xadrez completo. Brancas (você) vs Pretas (AI simples). Salvar/Carregar.' : 'Full chess. White (you) vs Black (simple AI). Save/Load.' }}
+        {{ locale.current === 'pt-BR' ? 'Xadrez simplificado. Jogue de brancas, capture o rei e salve a partida no navegador.' : 'Simplified chess. Play White, capture the king and save your game in this browser.' }}
       </p>
       <button class="arcade-btn arcade-btn-amber" @click="start">▶ START</button>
     </div>
@@ -242,7 +256,7 @@ function load() {
           </div>
         </template>
       </div>
-      <p v-if="status === 'won'" class="amber-phosphor text-shadow-neon font-display text-center">★ XEQUE-MATE ★</p>
+      <p v-if="status === 'won'" class="amber-phosphor text-shadow-neon font-display text-center">{{ locale.isPt ? '★ VOCÊ VENCEU ★' : '★ YOU WIN ★' }}</p>
       <p v-else-if="status === 'lost'" class="danger-phosphor text-shadow-neon font-display text-center">✕ DERROTADO ✕</p>
     </div>
   </CrtFrame>

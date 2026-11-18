@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
 import { useAudio } from '../../composables/useAudio'
+import { useGameLoop } from '../../composables/useGameLoop'
 import CrtFrame from '../../components/CrtFrame.vue'
 
 const router = useRouter()
@@ -17,7 +18,7 @@ const obstacles = ref<string[]>([])
 const obstaclesLine = ref('')
 const f = ref(0)  // 0=going right, 1=at right, 2=going back
 const missions = ref(0)
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 
 const OBSTACLES = [
   '== = = == == = = ==',
@@ -29,6 +30,10 @@ const OBSTACLES = [
 ]
 
 function start() {
+  cycle.stop()
+  cycleT = 0
+  lightOn.value = false
+  log.value = []
   playerX.value = 0
   f.value = 0
   missions.value = 0
@@ -36,15 +41,15 @@ function start() {
   obstacles.value = OBSTACLES[0].padEnd(W).split('')
   status.value = 'playing'
   sfx.start()
+  cycle.start()
 }
-
-let cycleTimer: number | null = null
 let cycleT = 0
 
-function gameLoop() {
-  cycleT += 50
+const log = ref<string[]>([])
+const cycle = useGameLoop((dt) => {
+  cycleT += dt
   if (cycleT >= 400) {
-    cycleT = 0
+    cycleT -= 400
     lightOn.value = !lightOn.value
   }
   // Check capture
@@ -53,20 +58,9 @@ function gameLoop() {
     sfx.lose()
     log.value.push(locale.current === 'pt-BR' ? 'Você foi visto!' : 'You were seen!')
     status.value = 'lost'
-    return
+    cycle.stop()
   }
-}
-
-import { watch } from 'vue'
-const log = ref<string[]>([])
-
-let loop: number | null = null
-
-function tick() {
-  if (status.value !== 'playing') return
-  gameLoop()
-  loop = requestAnimationFrame(tick)
-}
+})
 
 function move(d: number) {
   if (status.value !== 'playing') return
@@ -83,6 +77,7 @@ function move(d: number) {
     sfx.coin()
     if (missions.value >= 8) {
       status.value = 'won'
+      cycle.stop()
       sfx.win()
       return
     }
@@ -99,14 +94,8 @@ function onKey(e: KeyboardEvent) {
   if (e.key === 'm' || e.key === 'M' || e.key === 'ArrowRight') move(1)
 }
 
-onMounted(() => {
-  window.addEventListener('keydown', onKey)
-  loop = requestAnimationFrame(tick)
-})
-onUnmounted(() => {
-  window.removeEventListener('keydown', onKey)
-  if (loop) cancelAnimationFrame(loop)
-})
+onMounted(() => window.addEventListener('keydown', onKey))
+onUnmounted(() => window.removeEventListener('keydown', onKey))
 
 function onQuit() { router.push('/') }
 </script>
@@ -119,7 +108,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="missions === 0 && status === 'playing'" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'N/M = esquerda/direita. Atravesse ida e volta. Cuidado com o holofote.' : 'N/M = left/right. Cross there and back. Watch the spotlight.' }}
       </p>

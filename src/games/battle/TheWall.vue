@@ -14,7 +14,7 @@ const soldiers = ref(5)
 const enemyDist = ref(100)
 const turn = ref(0)
 const log = ref<string[]>([])
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 
 function start() {
   wall.value = 0
@@ -68,7 +68,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="turn === 0 && status === 'playing'" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'Construa o muro antes do ataque. Wall precisa ≥ 20 em 12 turnos.' : 'Build the wall before attack. Wall needs ≥ 20 in 12 turns.' }}
       </p>

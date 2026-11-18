@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
 import { useAudio } from '../../composables/useAudio'
+import { useRoundTimer } from '../../composables/useRoundTimer'
 import CrtFrame from '../../components/CrtFrame.vue'
 
 const router = useRouter()
@@ -20,7 +21,10 @@ const input = ref('')
 const log = ref<string[]>([])
 const status = ref<'playing' | 'won' | 'lost'>('playing')
 
+const { schedule, cancel } = useRoundTimer()
+
 function start() {
+  cancel()
   score.value = 0
   L.value = 1
   K.value = 0
@@ -42,7 +46,7 @@ function nextRound() {
   phase.value = 'show'
   sfx.start()
   const showTime = Math.max(800, L.value * 600)
-  setTimeout(() => {
+  schedule(() => {
     phase.value = 'recall'
   }, showTime)
 }
@@ -58,7 +62,7 @@ function submitChar(c: string) {
     sfx.lose()
     phase.value = 'result'
     if (score.value > highScore.value) highScore.value = score.value
-    setTimeout(() => {
+    schedule(() => {
       status.value = score.value > 20 ? 'won' : 'lost'
     }, 1500)
     return
@@ -76,7 +80,7 @@ function submitChar(c: string) {
       sfx.win()
       return
     }
-    setTimeout(() => nextRound(), 1500)
+    schedule(() => nextRound(), 1500)
   }
 }
 
@@ -105,7 +109,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="score === 0 && status === 'playing'" class="text-center py-6">
+    <div v-if="phase === 'idle'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'Memorize ESQ/DIR. Sequência cresce a cada 5 acertos.' : 'Memorize L/R. Sequence grows every 5 hits.' }}
       </p>

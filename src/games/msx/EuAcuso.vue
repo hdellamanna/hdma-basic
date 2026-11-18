@@ -30,7 +30,7 @@ const PLACES = ['library', 'kitchen', 'study', 'garden', 'ballroom']
 
 const target = ref<{ suspect: typeof SUSPECTS.value[number]; weapon: typeof WEAPONS[number] } | null>(null)
 const log = ref<string[]>([])
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 const input = ref('')
 const tries = ref(0)
 
@@ -92,7 +92,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="tries === 0 && log.length === 1 && status === 'playing'" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-2">
         {{ locale.current === 'pt-BR' ? 'Interrogue suspeitos (nome). Acuse: "FACA SILVA" = arma suspeito.' : 'Interrogate (name). Accuse: "KNIFE SMITH" = weapon suspect.' }}
       </p>

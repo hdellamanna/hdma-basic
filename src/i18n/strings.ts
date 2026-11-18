@@ -80,8 +80,8 @@ export const UI_STRINGS: Record<string, Record<Locale, string>> = {
     en: 'LIVES',
   },
   pressStart: {
-    'pt-BR': 'PRESSIONE QUALQUER TECLA PARA COMEÇAR',
-    en: 'PRESS ANY KEY TO START',
+    'pt-BR': 'Iniciar clássico',
+    en: 'Start classic',
   },
   coinInserted: {
     'pt-BR': 'MOEDA INSERIDA',

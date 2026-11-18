@@ -23,28 +23,42 @@ let timer: number | null = null
 
 function rand(n: number) { return Math.floor(Math.random() * n) }
 
+function emptyCell() {
+  const available = Array.from({ length: W * W }, (_, index) => ({
+    x: index % W,
+    y: Math.floor(index / W),
+  })).filter(({ x, y }) => !positions.value.some((position) => position.x === x && position.y === y))
+  return available[rand(available.length)]
+}
+
 function setup() {
   positions.value = []
   for (let i = 1; i <= 9; i++) {
-    positions.value.push({ n: i, x: rand(W), y: rand(W) })
+    const { x, y } = emptyCell()
+    positions.value.push({ n: i, x, y })
   }
   moved.value = -1
   phase.value = 'show1'
   sfx.start()
   timer = window.setTimeout(() => {
-    // Move one
-    const m = rand(9)
-    moved.value = positions.value[m].n
-    positions.value[m].x = rand(W)
-    positions.value[m].y = rand(W)
-    phase.value = 'show2'
-    timer = window.setTimeout(() => {
-      phase.value = 'ask'
-    }, 1500)
+    revealMove()
   }, 2500)
 }
 
+function revealMove() {
+  const position = positions.value[rand(positions.value.length)]
+  const { x, y } = emptyCell()
+  moved.value = position.n
+  position.x = x
+  position.y = y
+  phase.value = 'show2'
+  timer = window.setTimeout(() => {
+    phase.value = 'ask'
+  }, 1500)
+}
+
 function start() {
+  if (timer !== null) window.clearTimeout(timer)
   score.value = 0
   streak.value = 0
   log.value = [locale.current === 'pt-BR' ? 'Memorize 9 números. Um se moveu.' : 'Memorize 9 numbers. One moved.']
@@ -54,7 +68,7 @@ function start() {
 }
 
 function submit() {
-  if (phase.value !== 'ask') return
+  if (status.value !== 'playing' || phase.value !== 'ask') return
   const v = parseInt(input.value, 10)
   if (isNaN(v) || v < 1 || v > 9) {
     sfx.error()
@@ -87,8 +101,11 @@ function submit() {
 function onKey(e: KeyboardEvent) {
   if (status.value !== 'playing') return
   if (phase.value === 'show1' || phase.value === 'show2') {
-    // Skip to answer
-    if (e.key === ' ') phase.value = 'ask'
+    if (e.key !== ' ' || e.target instanceof HTMLButtonElement) return
+    e.preventDefault()
+    if (timer !== null) window.clearTimeout(timer)
+    if (phase.value === 'show1') revealMove()
+    else phase.value = 'ask'
   } else if (phase.value === 'ask') {
     if (e.key === 'Enter') submit()
     else if (/^[1-9]$/.test(e.key)) input.value = e.key
@@ -112,7 +129,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="streak === 0 && score === 0 && status === 'playing'" class="text-center py-6">
+    <div v-if="phase === 'idle'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'Memorize 9 números. Um se move. Qual?' : 'Memorize 9 numbers. One moves. Which?' }}
       </p>

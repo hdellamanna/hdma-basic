@@ -14,10 +14,11 @@ const shipX = ref(W / 2)
 const bombs = ref<{ x: number; y: number; vx: number; vy: number }[]>([])
 const targets = ref<{ x: number; y: number; alive: boolean }[]>([])
 const score = ref(0)
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 let frame: number | null = null
 
 function start() {
+  if (frame !== null) cancelAnimationFrame(frame)
   shipX.value = W / 2
   bombs.value = []
   targets.value = [
@@ -81,7 +82,7 @@ function onKey(e: KeyboardEvent) {
 onMounted(() => window.addEventListener('keydown', onKey))
 onUnmounted(() => {
   window.removeEventListener('keydown', onKey)
-  if (frame) cancelAnimationFrame(frame)
+  if (frame !== null) cancelAnimationFrame(frame)
 })
 
 function onQuit() { router.push('/') }
@@ -95,7 +96,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="targets.length === 0" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'Solte bombas sobre os alvos. Setas + ESPAÇO.' : 'Drop bombs on targets. Arrows + SPACE.' }}
       </p>

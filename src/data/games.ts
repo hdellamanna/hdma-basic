@@ -346,7 +346,7 @@ export const GAMES: GameManifest[] = [
     year: 1982,
     difficulty: 3,
     genre: 'simulation',
-    controls: 'typing',
+    controls: 'click',
     avgDurationSec: 120,
     i18n: {
       'pt-BR': {
@@ -1243,14 +1243,14 @@ export const GAMES: GameManifest[] = [
     i18n: {
       'pt-BR': {
         title: 'Damas',
-        shortDesc: 'Jogo de damas completo com verificação de lances.',
+        shortDesc: 'Jogo de damas contra o computador.',
         objective: 'Capturar todas as peças do adversário ou bloqueá-lo.',
         instructions:
           'Clique na peça para selecioná-la, depois clique no destino. Capturas são obrigatórias. Damas andam para trás.',
       },
       en: {
         title: 'Checkers',
-        shortDesc: 'Full checkers with move validation.',
+        shortDesc: 'Checkers against the computer.',
         objective: 'Capture all opponent pieces or block them.',
         instructions:
           'Click a piece to select, then click the destination. Captures are mandatory. Kings move backward.',
@@ -1269,17 +1269,17 @@ export const GAMES: GameManifest[] = [
     i18n: {
       'pt-BR': {
         title: 'Xadrez',
-        shortDesc: 'Xadrez completo com save em fita (localStorage).',
-        objective: 'Dar xeque-mate no rei adversário.',
+        shortDesc: 'Xadrez simplificado com opção de salvar no navegador.',
+        objective: 'Capturar o rei adversário.',
         instructions:
-          'Movimento padrão de xadrez. Save/Load via botão. Sem engine — jogue contra outro humano.',
+          'Jogue de brancas contra o computador. Use Salvar e Carregar para continuar uma partida.',
       },
       en: {
         title: 'Chess',
-        shortDesc: 'Full chess with save to tape (localStorage).',
-        objective: 'Checkmate the opponent king.',
+        shortDesc: 'Simplified chess with browser saves.',
+        objective: 'Capture the opposing king.',
         instructions:
-          'Standard chess rules. Save/Load via button. No engine — play against another human.',
+          'Play White against the computer. Use Save and Load to resume a game.',
       },
     },
   },
@@ -1296,16 +1296,16 @@ export const GAMES: GameManifest[] = [
       'pt-BR': {
         title: 'Gustavus',
         shortDesc: 'Jogo tradicional de lápis e papel adaptado para o computador.',
-        objective: 'Forçar o adversário a completar um quadrado.',
+        objective: 'Completar mais quadrados que o computador.',
         instructions:
-          'Jogo de pontos e linhas em um grid 5×5. Conecte pontos adjacentes sem fechar quadrados.',
+          'Jogo de pontos e linhas em um grid 5×5. Conecte pontos adjacentes. Ao fechar um quadrado, você joga outra vez.',
       },
       en: {
         title: 'Gustavus',
         shortDesc: 'Traditional pencil and paper game adapted for the computer.',
-        objective: 'Force the opponent to complete a square.',
+        objective: 'Complete more boxes than the computer.',
         instructions:
-          'Dots and lines game on a 5×5 grid. Connect adjacent dots without closing squares.',
+          'Dots and lines game on a 5×5 grid. Connect adjacent dots. Close a box to play again.',
       },
     },
   },

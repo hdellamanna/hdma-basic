@@ -13,7 +13,7 @@ const code = ref([0, 0, 0, 0])
 const guess = ref([0, 0, 0, 0])
 const tries = ref(0)
 const log = ref<string[]>([])
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 
 function start() {
   code.value = [
@@ -66,7 +66,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="tries === 0 && status === 'playing'" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'Adivinhe o código de 4 dígitos em 6 tentativas. ✓ = certo, ○ = presente mas em outra posição.' : 'Guess the 4-digit code in 6 tries. ✓ = right, ○ = right digit wrong place.' }}
       </p>

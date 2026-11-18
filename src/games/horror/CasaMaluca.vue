@@ -17,7 +17,7 @@ const doors = ref<{ x: number; dir: number }[]>([
 const target = ref({ x: 5, y: 0 })
 const ghostDist = ref(40)
 const log = ref<string[]>([])
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 
 function start() {
   doors.value = [
@@ -85,7 +85,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="ghostDist === 40 && status === 'playing'" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-2">
         {{ locale.current === 'pt-BR' ? 'Alinhe as 3 portas (1/2/3) antes do fantasma te pegar.' : 'Align the 3 doors (1/2/3) before the ghost catches you.' }}
       </p>

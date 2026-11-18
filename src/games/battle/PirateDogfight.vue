@@ -23,6 +23,7 @@ let lastP = 0
 let frame: number | null = null
 
 function start() {
+  if (frame !== null) cancelAnimationFrame(frame)
   shipX.value = W / 2
   shipY.value = H - 30
   pirates.value = []
@@ -107,7 +108,7 @@ function onKey(e: KeyboardEvent) {
 onMounted(() => window.addEventListener('keydown', onKey))
 onUnmounted(() => {
   window.removeEventListener('keydown', onKey)
-  if (frame) cancelAnimationFrame(frame)
+  if (frame !== null) cancelAnimationFrame(frame)
 })
 
 function onQuit() { router.push('/') }

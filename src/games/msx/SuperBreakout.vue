@@ -16,7 +16,7 @@ const bricks = ref<{ x: number; y: number; alive: boolean }[]>([])
 const score = ref(0)
 const lives = ref(3)
 const level = ref(0)
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 let frame: number | null = null
 
 function buildBricks() {
@@ -29,6 +29,7 @@ function buildBricks() {
 }
 
 function start() {
+  if (frame !== null) cancelAnimationFrame(frame)
   score.value = 0
   lives.value = 3
   level.value = 1
@@ -92,7 +93,7 @@ function onKey(e: KeyboardEvent) {
 onMounted(() => window.addEventListener('keydown', onKey))
 onUnmounted(() => {
   window.removeEventListener('keydown', onKey)
-  if (frame) cancelAnimationFrame(frame)
+  if (frame !== null) cancelAnimationFrame(frame)
 })
 
 function onQuit() { router.push('/') }
@@ -107,7 +108,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="bricks.length === 0" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'Quebre os tijolos. Setas para mover. 3 fases.' : 'Break the bricks. Arrows to move. 3 levels.' }}
       </p>

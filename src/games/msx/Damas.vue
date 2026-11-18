@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
 import { useAudio } from '../../composables/useAudio'
+import { useRoundTimer } from '../../composables/useRoundTimer'
 import CrtFrame from '../../components/CrtFrame.vue'
 
 const router = useRouter()
@@ -16,6 +17,7 @@ const selected = ref<{ r: number; c: number } | null>(null)
 const validMoves = ref<{ r: number; c: number; jump?: { r: number; c: number } }[]>([])
 const log = ref<string[]>([])
 const status = ref<'playing' | 'won' | 'lost'>('playing')
+const { schedule, cancel } = useRoundTimer()
 
 function initBoard() {
   board.value = Array(8).fill(null).map(() => Array(8).fill(null))
@@ -32,6 +34,7 @@ function initBoard() {
 }
 
 function start() {
+  cancel()
   initBoard()
   turn.value = 'r'
   selected.value = null
@@ -46,7 +49,7 @@ function getMoves(r: number, c: number) {
   const moves: typeof validMoves.value = []
   const dirs = piece.color === piece.color.toUpperCase()
     ? [[-1, -1], [-1, 1], [1, -1], [1, 1]]
-    : turn.value === 'r' ? [[1, -1], [1, 1]] : [[-1, -1], [-1, 1]]
+    : turn.value === 'r' ? [[-1, -1], [-1, 1]] : [[1, -1], [1, 1]]
   for (const [dr, dc] of dirs) {
     const nr = r + dr, nc = c + dc
     if (nr < 0 || nr >= 8 || nc < 0 || nc >= 8) continue
@@ -66,11 +69,11 @@ function getMoves(r: number, c: number) {
 }
 
 function select(r: number, c: number) {
-  if (status.value !== 'playing') return
+  if (status.value !== 'playing' || turn.value !== 'r') return
   const p = board.value[r][c]
   if (p && p.color.toLowerCase() === turn.value) {
     selected.value = { r, c }
-    validMoves.value = getMoves(r, c)
+    validMoves.value = availableMoves().filter(({ from }) => from.r === r && from.c === c).map(({ mv }) => mv)
     sfx.select()
   } else if (selected.value) {
     const mv = validMoves.value.find((m) => m.r === r && m.c === c)
@@ -98,16 +101,21 @@ function move(mv: { r: number; c: number; jump?: { r: number; c: number } }) {
   // Check win
   const redCount = board.value.flat().filter((p) => p && p.color.toLowerCase() === 'r').length
   const blackCount = board.value.flat().filter((p) => p && p.color.toLowerCase() === 'b').length
-  if (redCount === 0) { status.value = 'won'; sfx.win(); return }
-  if (blackCount === 0) { status.value = 'lost'; sfx.lose(); return }
+  if (redCount === 0) { status.value = 'lost'; sfx.lose(); return }
+  if (blackCount === 0) { status.value = 'won'; sfx.win(); return }
   // AI: simple move for black
   turn.value = turn.value === 'r' ? 'b' : 'r'
-  if (turn.value === 'b') {
-    setTimeout(aiMove, 500)
+  const nextMoves = availableMoves()
+  if (nextMoves.length === 0) {
+    status.value = turn.value === 'r' ? 'lost' : 'won'
+    if (status.value === 'won') sfx.win()
+    else sfx.lose()
+  } else if (turn.value === 'b') {
+    schedule(() => aiMove(nextMoves), 500)
   }
 }
 
-function aiMove() {
+function availableMoves() {
   const allMoves: { from: { r: number; c: number }; mv: { r: number; c: number; jump?: { r: number; c: number } } }[] = []
   for (let r = 0; r < 8; r++) {
     for (let c = 0; c < 8; c++) {
@@ -115,17 +123,16 @@ function aiMove() {
       for (const m of mvs) allMoves.push({ from: { r, c }, mv: m })
     }
   }
-  if (allMoves.length === 0) {
-    status.value = 'won'
-    sfx.win()
-    return
-  }
-  // Prefer jumps
-  const jumps = allMoves.filter((x) => x.mv.jump)
-  const choice = (jumps.length > 0 ? jumps : allMoves)[Math.floor(Math.random() * (jumps.length > 0 ? jumps.length : allMoves.length))]
+  const captures = allMoves.filter(({ mv }) => mv.jump)
+  return captures.length ? captures : allMoves
+}
+
+function aiMove(allMoves: ReturnType<typeof availableMoves>) {
+  if (status.value !== 'playing' || turn.value !== 'b') return
+  const choice = allMoves[Math.floor(Math.random() * allMoves.length)]
   selected.value = choice.from
   validMoves.value = getMoves(choice.from.r, choice.from.c)
-  setTimeout(() => move(choice.mv), 200)
+  move(choice.mv)
 }
 
 function onKey(e: KeyboardEvent) {
