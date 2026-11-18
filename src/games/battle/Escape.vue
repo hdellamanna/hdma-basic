@@ -14,7 +14,7 @@ const player = ref({ x: 0, y: 4 })
 const hasKey = ref(false)
 const turns = ref(0)
 const maxTurns = 30
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 
 // 0 = floor, 1 = wall, 2 = key, 3 = door, 4 = exit
 const map = ref([
@@ -90,7 +90,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="turns === 0 && status === 'playing'" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'Pegue a chave, abra a porta, chegue à saída em 30 turnos.' : 'Get the key, open the door, reach the exit in 30 turns.' }}
       </p>

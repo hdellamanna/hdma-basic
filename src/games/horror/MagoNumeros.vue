@@ -15,7 +15,7 @@ const tries = ref(8)
 const d1 = ref(0); const d2 = ref(0)
 const a = ref(''); const b = ref('')
 const log = ref<string[]>([])
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 
 function start() {
   tries.value = 8
@@ -87,7 +87,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="tries === 8 && log.length === 0 && status === 'playing'" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'O Mago joga 2 dados. Encontre 2 números da tela cuja soma bata. 8 tentativas.' : 'The Wizard rolls 2 dice. Find 2 numbers from the screen that sum to it. 8 tries.' }}
       </p>

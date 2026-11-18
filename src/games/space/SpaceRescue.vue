@@ -15,7 +15,7 @@ const astronauts = ref<{ x: number; y: number; rescued: boolean }[]>([])
 const rescued = ref(0)
 const turns = ref(0)
 const maxTurns = 30
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 
 function start() {
   player.value = { x: 5, y: 5 }
@@ -78,7 +78,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="astronauts.length === 0" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'Resgate 5 astronautas em 30 turnos. Setas para mover.' : 'Rescue 5 astronauts in 30 turns. Arrows to move.' }}
       </p>

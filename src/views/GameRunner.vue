@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, shallowRef, type Component } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { useLocaleStore } from '../stores/locale'
 import { useArcadeStore } from '../stores/arcade'
@@ -8,67 +8,7 @@ import { useAudio } from '../composables/useAudio'
 import { GAMES } from '../data/games'
 import { MANUALS } from '../data/manuals'
 
-// Import games dynamically by id
-import HauntedHouse from '../games/HauntedHouse.vue'
-import StarshipTakeoff from '../games/space/StarshipTakeoff.vue'
-import IntergalacticGames from '../games/space/IntergalacticGames.vue'
-import EvilAlien from '../games/space/EvilAlien.vue'
-import BeatBugEyes from '../games/space/BeatBugEyes.vue'
-import Moonlander from '../games/space/Moonlander.vue'
-import MonstersGalacticon from '../games/space/MonstersGalacticon.vue'
-import AlienSnipers from '../games/space/AlienSnipers.vue'
-import AsteroidBelt from '../games/space/AsteroidBelt.vue'
-import TripFuture from '../games/space/TripFuture.vue'
-import DeathValley from '../games/space/DeathValley.vue'
-import SpaceMines from '../games/space/SpaceMines.vue'
-import SpaceRescue from '../games/space/SpaceRescue.vue'
-import Touchdown from '../games/space/Touchdown.vue'
-import DungeonOfDoom from '../games/DungeonOfDoom.vue'
-import RobotMissile from '../games/battle/RobotMissile.vue'
-import VitalMessage from '../games/battle/VitalMessage.vue'
-import Shootout from '../games/battle/Shootout.vue'
-import DesertTank from '../games/battle/DesertTank.vue'
-import TraitorsCastle from '../games/battle/TraitorsCastle.vue'
-import RobotInvaders from '../games/battle/RobotInvaders.vue'
-import SecretWeapon from '../games/battle/SecretWeapon.vue'
-import Escape from '../games/battle/Escape.vue'
-import PirateDogfight from '../games/battle/PirateDogfight.vue'
-import SupersonicBomber from '../games/battle/SupersonicBomber.vue'
-import Iceberg from '../games/battle/Iceberg.vue'
-import TheWall from '../games/battle/TheWall.vue'
-import MissileGame from '../games/battle/MissileGame.vue'
-import TowerTerror from '../games/weird/TowerTerror.vue'
-import SkullsPyramid from '../games/weird/SkullsPyramid.vue'
-import MonsterWrestling from '../games/weird/MonsterWrestling.vue'
-import Jaws from '../games/weird/Jaws.vue'
-import FlyingWitches from '../games/weird/FlyingWitches.vue'
-import Micropuzzle from '../games/weird/Micropuzzle.vue'
-import Pesadelo from '../games/horror/Pesadelo.vue'
-import MagoNumeros from '../games/horror/MagoNumeros.vue'
-import AspiradorFantasmas from '../games/horror/AspiradorFantasmas.vue'
-import MulherAranha from '../games/horror/MulherAranha.vue'
-import Cemiterio from '../games/horror/Cemiterio.vue'
-import CasaMaluca from '../games/horror/CasaMaluca.vue'
-import LabirintoAssombrado from '../games/horror/LabirintoAssombrado.vue'
-import SessaoEspirita from '../games/horror/SessaoEspirita.vue'
-import MarieCeleste from '../games/msx/MarieCeleste.vue'
-import DigaMestre from '../games/msx/DigaMestre.vue'
-import EuAcuso from '../games/msx/EuAcuso.vue'
-import StarTrek from '../games/msx/StarTrek.vue'
-import SuperBreakout from '../games/msx/SuperBreakout.vue'
-import Labirinto3D from '../games/msx/Labirinto3D.vue'
-import Damas from '../games/msx/Damas.vue'
-import Xadrez from '../games/msx/Xadrez.vue'
-import Gustavus from '../games/msx/Gustavus.vue'
-import OlhosEspiao from '../games/spy/OlhosEspiao.vue'
-import Holofote from '../games/spy/Holofote.vue'
-import Espiobot from '../games/spy/Espiobot.vue'
-import TesteEspioes from '../games/spy/TesteEspioes.vue'
-import GeradorMensagens from '../games/spy/GeradorMensagens.vue'
-import EncontroMarcado from '../games/spy/EncontroMarcado.vue'
-import CodigoMorse from '../games/spy/CodigoMorse.vue'
-import AppleLogo from '../games/logo/Logo.vue'
-
+import { classicGames } from '../games/loaders'
 const route = useRoute()
 const router = useRouter()
 const locale = useLocaleStore()
@@ -80,80 +20,9 @@ const gameId = computed(() => String(route.params.gameId || ''))
 const game = computed(() => GAMES.find((g) => g.id === gameId.value && g.manualId === manualId.value) ?? null)
 const manual = computed(() => MANUALS.find((m) => m.id === manualId.value) ?? null)
 
-const gameMap: Record<string, any> = {
-  'haunted-house': HauntedHouse,
-  'starship-takeoff': StarshipTakeoff,
-  'intergalactic-games': IntergalacticGames,
-  'evil-alien': EvilAlien,
-  'beat-the-bug-eyes': BeatBugEyes,
-  'moonlander': Moonlander,
-  'monsters-of-galacticon': MonstersGalacticon,
-  'alien-snipers': AlienSnipers,
-  'asteroid-belt': AsteroidBelt,
-  'trip-into-the-future': TripFuture,
-  'death-valley': DeathValley,
-  'space-mines': SpaceMines,
-  'space-rescue': SpaceRescue,
-  'touchdown': Touchdown,
-  'dungeon-of-doom': DungeonOfDoom,
-  'robot-missile': RobotMissile,
-  'the-vital-message': VitalMessage,
-  'shootout': Shootout,
-  'desert-tank-battle': DesertTank,
-  'battle-at-traitors-castle': TraitorsCastle,
-  'robot-invaders': RobotInvaders,
-  'secret-weapon': SecretWeapon,
-  'escape': Escape,
-  'pirate-dogfight': PirateDogfight,
-  'supersonic-bomber': SupersonicBomber,
-  'iceberg': Iceberg,
-  'the-wall': TheWall,
-  'missile': MissileGame,
-  'tower-of-terror': TowerTerror,
-  'skulls-of-the-pyramid': SkullsPyramid,
-  'monster-wrestling': MonsterWrestling,
-  'jaws': Jaws,
-  'flying-witches': FlyingWitches,
-  'micropuzzle': Micropuzzle,
-  'pesadelo': Pesadelo,
-  'mago-dos-numeros': MagoNumeros,
-  'aspirador-de-fantasmas': AspiradorFantasmas,
-  'mulher-aranha': MulherAranha,
-  'cemiterio': Cemiterio,
-  'casa-maluca': CasaMaluca,
-  'labirinto-assombrado': LabirintoAssombrado,
-  'sessao-espirita': SessaoEspirita,
-  'marie-celeste': MarieCeleste,
-  'diga-mestre': DigaMestre,
-  'eu-acuso': EuAcuso,
-  'star-trek': StarTrek,
-  'super-breakout': SuperBreakout,
-  'labirinto-3d': Labirinto3D,
-  'damas': Damas,
-  'xadrez': Xadrez,
-  'gustavus': Gustavus,
-  'olhos-espiao': OlhosEspiao,
-  'holofote': Holofote,
-  'espiobot': Espiobot,
-  'teste-espioes': TesteEspioes,
-  'gerador-mensagens': GeradorMensagens,
-  'encontro-marcado': EncontroMarcado,
-  'codigo-morse': CodigoMorse,
-  'apple-logo': AppleLogo,
-}
-
-const GameComponent = computed(() => gameMap[gameId.value] ?? null)
-
 onMounted(() => {
-  if (!game.value) {
-    router.replace({ name: 'floor' })
-  }
-})
-
-watch(gameId, () => {
-  if (!GAMES.find((g) => g.id === gameId.value)) {
-    router.replace({ name: 'floor' })
-  }
+  arcade.selectManual(manualId.value)
+  if (!game.value) router.replace({ name: 'floor' })
 })
 
 const accentText = computed(() => {
@@ -171,9 +40,27 @@ const accentText = computed(() => {
 
 // Show instructions panel before launching
 const showInstructions = ref(true)
-function startGame() {
-  showInstructions.value = false
+const GameComponent = shallowRef<Component | null>(null)
+const loading = ref(false)
+const loadError = ref(false)
+let active = true
+onUnmounted(() => { active = false })
+
+async function startGame() {
+  if (loading.value) return
+  loading.value = true
+  loadError.value = false
   sfx.start()
+  try {
+    const selected = await classicGames[gameId.value]()
+    if (!active) return
+    GameComponent.value = selected.default
+    showInstructions.value = false
+  } catch {
+    if (active) loadError.value = true
+  } finally {
+    if (active) loading.value = false
+  }
 }
 </script>
 
@@ -203,6 +90,9 @@ function startGame() {
       <h1 class="font-display text-lg sm:text-2xl text-shadow-neon" :class="accentText">
         {{ game.i18n[locale.current].title }}
       </h1>
+      <RouterLink v-if="game.id === 'moonlander'" :to="{ name: 'remastered' }" class="pavilion-link">
+        {{ locale.isPt ? 'Remastered · Correio Lunar' : 'Remastered · Lunar Courier' }}
+      </RouterLink>
       <span class="text-[10px] font-display tracking-widest text-ink-muted">
         {{ game.year }} · {{ manual?.i18n[locale.current].title }}
       </span>
@@ -244,12 +134,13 @@ function startGame() {
         <button
           type="button"
           class="arcade-btn arcade-btn-amber"
+          :disabled="loading"
           @click="startGame"
         >
-          ▶ {{ t('pressStart', locale.current) }}
+          ▶ {{ loading ? (locale.isPt ? 'Carregando…' : 'Loading…') : t('pressStart', locale.current) }}
         </button>
         <a
-          v-if="manual"
+          v-if="manual?.pdfPath"
           :href="manual.pdfPath"
           target="_blank"
           rel="noopener"
@@ -266,14 +157,8 @@ function startGame() {
       v-if="!showInstructions && GameComponent"
       :is="GameComponent"
     />
-    <div
-      v-else-if="!showInstructions && !GameComponent"
-      class="rounded border border-danger/40 bg-danger/5 p-6 text-center"
-    >
-      <p class="danger-phosphor text-shadow-neon font-display text-sm">⚠ {{ t('gameOver', locale.current) }}</p>
-      <p class="text-sm text-ink-muted mt-2">
-        Game component missing for <code class="text-ink">{{ gameId }}</code>.
-      </p>
-    </div>
+    <p v-if="loadError" role="alert" class="mt-4 text-danger">
+      {{ locale.isPt ? 'Falha ao carregar o jogo. Tente iniciar novamente.' : 'The game could not load. Try starting it again.' }}
+    </p>
   </section>
 </template>

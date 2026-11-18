@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
 import { useAudio } from '../../composables/useAudio'
+import { useGameLoop } from '../../composables/useGameLoop'
+import { useRoundTimer } from '../../composables/useRoundTimer'
 import CrtFrame from '../../components/CrtFrame.vue'
 
 const router = useRouter()
@@ -16,7 +18,7 @@ const fuel = ref(100)
 const targetX = ref(50)
 const shipX = ref(50)
 const log = ref<string[]>([])
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 
 const levels = [
   { alt: 200, grav: 1.62, wind: 0 },
@@ -27,6 +29,9 @@ const levels = [
 ]
 const level = ref(0)
 const score = ref(0)
+const landed = ref(false)
+const { schedule, cancel } = useRoundTimer()
+const groundOffset = computed(() => Math.min(90, altitude.value / levels[level.value].alt * 90))
 
 function nextLevel() {
   if (level.value >= levels.length) {
@@ -42,23 +47,21 @@ function nextLevel() {
   shipX.value = 50
   targetX.value = 40 + Math.random() * 20
   log.value = []
+  landed.value = false
   status.value = 'playing'
+  loop.start()
 }
 
 function start() {
+  cancel()
+  loop.stop()
   level.value = 0
   score.value = 0
   nextLevel()
 }
 
-let loopId: number | null = null
-let last = 0
-
-function tick(now: number) {
-  if (status.value !== 'playing') return
-  if (!last) last = now
-  const dt = Math.min(100, now - last) / 1000
-  last = now
+const loop = useGameLoop((dtMs) => {
+  const dt = dtMs / 1000
   const l = levels[level.value]
   vSpeed.value += l.grav * dt
   altitude.value -= vSpeed.value * dt * 8
@@ -66,14 +69,22 @@ function tick(now: number) {
 
   if (altitude.value <= 0) {
     altitude.value = 0
+    loop.stop()
     const drift = Math.abs(shipX.value - targetX.value)
     if (vSpeed.value <= 5 && drift < 10) {
       log.value.push(`★ Touchdown! drift=${drift.toFixed(1)} v=${vSpeed.value.toFixed(1)}`)
       sfx.coin()
       score.value += Math.floor(100 - vSpeed.value * 5 - drift * 3)
-      level.value++
-      last = 0
-      setTimeout(() => nextLevel(), 1500)
+      landed.value = true
+      if (level.value === levels.length - 1) {
+        status.value = 'won'
+        sfx.win()
+      } else {
+        schedule(() => {
+          level.value++
+          nextLevel()
+        }, 1500)
+      }
     } else {
       log.value.push(`✕ Crash! v=${vSpeed.value.toFixed(1)} drift=${drift.toFixed(1)}`)
       status.value = 'lost'
@@ -81,11 +92,10 @@ function tick(now: number) {
       return
     }
   }
-  loopId = requestAnimationFrame(tick)
-}
+})
 
 function burn(vs: number, hs: number) {
-  if (fuel.value <= 0) return
+  if (status.value !== 'playing' || landed.value || fuel.value <= 0) return
   if (vs > 0) {
     vSpeed.value = Math.max(0, vSpeed.value - vs)
     fuel.value = Math.max(0, fuel.value - vs)
@@ -96,9 +106,6 @@ function burn(vs: number, hs: number) {
   }
   sfx.shoot()
 }
-
-onMounted(() => { loopId = requestAnimationFrame(tick) })
-onUnmounted(() => { if (loopId) cancelAnimationFrame(loopId) })
 
 function onQuit() { router.push('/') }
 </script>
@@ -111,7 +118,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="level === 0 && altitude === 0" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? '5 alunissagens. Controle velocidade vertical e drift horizontal.' : '5 landings. Control vertical speed and horizontal drift.' }}
       </p>
@@ -135,13 +142,13 @@ function onQuit() { router.push('/') }
         ></div>
         <div
           class="absolute phosphor text-shadow-neon"
-          :style="{ left: `${shipX}%`, bottom: '8px', transform: 'translateX(-50%)' }"
+          :style="{ left: `${shipX}%`, bottom: `${8 + groundOffset}px`, transform: 'translateX(-50%)' }"
         >▼</div>
       </div>
       <div class="grid grid-cols-3 gap-1">
-        <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-1.5" @click="burn(0, -2)">◀ L</button>
-        <button class="arcade-btn arcade-btn-amber text-[10px] py-1.5" @click="burn(3, 0)">▼ BRAKE</button>
-        <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-1.5" @click="burn(0, 2)">R ▶</button>
+        <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-1.5" :disabled="landed || status !== 'playing'" @click="burn(0, -2)">◀ L</button>
+        <button class="arcade-btn arcade-btn-amber text-[10px] py-1.5" :disabled="landed || status !== 'playing'" @click="burn(3, 0)">▼ BRAKE</button>
+        <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-1.5" :disabled="landed || status !== 'playing'" @click="burn(0, 2)">R ▶</button>
       </div>
       <div class="border border-surface-600 bg-surface-800 p-2 h-16 overflow-y-auto text-xs space-y-0.5">
         <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>

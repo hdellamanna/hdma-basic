@@ -111,6 +111,7 @@ function difficultyLabel(d: number) {
           </div>
         </dl>
         <a
+          v-if="manual.pdfPath"
           :href="manual.pdfPath"
           target="_blank"
           rel="noopener"

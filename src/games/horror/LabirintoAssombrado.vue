@@ -24,7 +24,7 @@ const player = ref({ x: 0, y: 0 })
 const ghost = ref({ x: 5, y: 3 })
 const dir = ref(1) // 1=N 2=E 3=S 4=W
 const moves = ref(0)
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 
 function start() {
   player.value = { x: 0, y: 0 }
@@ -107,7 +107,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="moves === 0 && status === 'playing'" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-2">
         {{ locale.current === 'pt-BR' ? 'Você só vê 3 células à frente. N=vira esquerda, M=vira direita, ESPAÇO=avança.' : 'You see 3 cells ahead. N=turn left, M=turn right, SPACE=forward.' }}
       </p>

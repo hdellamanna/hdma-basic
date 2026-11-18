@@ -22,7 +22,7 @@ const level = ref(5)  // starts at Apprentice = 5
 const discardsLeft = ref(5)
 const currentNum = ref(0)
 const log = ref<string[]>([])
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 const input = ref('')
 
 function start() {
@@ -120,7 +120,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="level === 5 && slots.every((s) => s === 0) && status === 'playing'" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR'
           ? 'Coloque 10 números em ordem do menor para o maior. D = descartar.'

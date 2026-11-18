@@ -13,7 +13,7 @@ const targets = ref<{ id: number; x: number; y: number; ttl: number }[]>([])
 const score = ref(0)
 const hits = ref(0)
 const timeLeft = ref(60)
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 const containerRef = ref<HTMLElement | null>(null)
 
 let lastSpawn = 0
@@ -59,6 +59,7 @@ function onClick(t: { id: number; x: number; y: number; ttl: number }) {
 }
 
 function start() {
+  if (frame !== null) cancelAnimationFrame(frame)
   score.value = 0
   hits.value = 0
   timeLeft.value = 60
@@ -80,7 +81,7 @@ function start() {
 onMounted(() => {})
 onUnmounted(() => {
   if (timer) clearInterval(timer)
-  if (frame) cancelAnimationFrame(frame)
+  if (frame !== null) cancelAnimationFrame(frame)
 })
 
 function onQuit() { router.push('/') }
@@ -94,7 +95,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="timeLeft === 60 && hits === 0 && status === 'playing'" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'Clique nos aliens antes que eles sumam. 15 em 60s.' : 'Click the aliens before they vanish. 15 in 60s.' }}
       </p>

@@ -29,7 +29,8 @@ export function useGameLoop(callback: (dtMs: number) => void) {
 
   function loop(now: number) {
     if (!running.value) return
-    const dt = now - last
+    // Bound the catch-up after background tabs or a stalled frame.
+    const dt = Math.min(now - last, 50)
     last = now
     frames++
     if (now - lastFps >= 1000) {
@@ -44,7 +45,7 @@ export function useGameLoop(callback: (dtMs: number) => void) {
       stop()
       return
     }
-    rafId = requestAnimationFrame(loop)
+    if (running.value) rafId = requestAnimationFrame(loop)
   }
 
   onUnmounted(stop)

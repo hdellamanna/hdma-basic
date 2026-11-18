@@ -14,7 +14,7 @@ const ghost = ref(0)
 const ghostX = ref(0)
 const lives = ref(3)
 const score = ref(0)
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 let timer: number | null = null
 
 function start() {
@@ -85,7 +85,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="score === 0 && status === 'playing' && lives === 3" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-2">
         {{ locale.current === 'pt-BR' ? 'Mude o número do aspirador (M=0-9). X para aspirar. Número deve bater com o fantasma.' : 'Change vacuum number (M=0-9). X to vacuum. Number must match ghost.' }}
       </p>

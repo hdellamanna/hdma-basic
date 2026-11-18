@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
 import { useAudio } from '../../composables/useAudio'
+import { useRoundTimer } from '../../composables/useRoundTimer'
 import CrtFrame from '../../components/CrtFrame.vue'
 
 const router = useRouter()
@@ -28,7 +29,10 @@ const streak = ref(0)
 const log = ref<string[]>([])
 const status = ref<'playing' | 'won' | 'lost'>('playing')
 
+const { schedule, cancel } = useRoundTimer()
+
 function start() {
+  cancel()
   score.value = 0
   streak.value = 0
   log.value = []
@@ -40,13 +44,13 @@ function next() {
   current.value = LETTERS[Math.floor(Math.random() * LETTERS.length)]
   phase.value = 'show'
   sfx.tick()
-  setTimeout(() => {
+  schedule(() => {
     phase.value = 'pick'
   }, 1500)
 }
 
 function pick(letter: string) {
-  if (phase.value !== 'pick') return
+  if (status.value !== 'playing' || phase.value !== 'pick') return
   sfx.type()
   if (letter === current.value) {
     score.value++
@@ -64,7 +68,7 @@ function pick(letter: string) {
     sfx.error()
   }
   phase.value = 'result'
-  setTimeout(() => next(), 1000)
+  schedule(() => next(), 1000)
 }
 
 function onKey(e: KeyboardEvent) {
@@ -90,7 +94,7 @@ const morse = computed(() => MORSE[current.value] || '?')
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="streak === 0 && score === 0 && status === 'playing'" class="text-center py-6">
+    <div v-if="phase === 'idle'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'Decodifique o Morse. Clique na letra correta.' : 'Decode the Morse. Click the right letter.' }}
       </p>

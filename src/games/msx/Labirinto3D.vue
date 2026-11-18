@@ -24,7 +24,7 @@ const bull = ref({ x: 5, y: 3 })
 const dir = ref(1)
 const moves = ref(0)
 const bullSteps = ref(8)
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 
 function start() {
   player.value = { x: 0, y: 0 }
@@ -120,7 +120,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="moves === 0 && status === 'playing'" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-2">
         {{ locale.current === 'pt-BR' ? 'Vista em primeira pessoa. N=vira esquerda, M=direita, ESPAÇO=avança. Encontre a cruz.' : 'First person. N=turn left, M=right, SPACE=forward. Find the cross.' }}
       </p>

@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
 import { useAudio } from '../../composables/useAudio'
+import { useRoundTimer } from '../../composables/useRoundTimer'
 import CrtFrame from '../../components/CrtFrame.vue'
 
 const router = useRouter()
@@ -24,7 +25,7 @@ const POSITIONS = [
 ]
 
 const targetPos = ref(POSITIONS[0])
-let hideTimer: number | null = null
+const { schedule } = useRoundTimer()
 
 function nextRound() {
   round.value++
@@ -39,9 +40,9 @@ function nextRound() {
   active.value = true
   // Random visible duration
   const visible = 400 + Math.random() * 1200
-  hideTimer = window.setTimeout(() => {
+  schedule(() => {
     active.value = false
-    setTimeout(nextRound, 500)
+    schedule(nextRound, 500)
   }, visible)
 }
 
@@ -54,8 +55,7 @@ function onKey(e: KeyboardEvent) {
     score.value += Math.max(0, Math.floor(100 - reaction / 10))
     sfx.hit()
     active.value = false
-    if (hideTimer) clearTimeout(hideTimer)
-    setTimeout(nextRound, 200)
+    schedule(nextRound, 200)
   }
 }
 
@@ -67,10 +67,7 @@ function start() {
 }
 
 onMounted(() => window.addEventListener('keydown', onKey))
-onUnmounted(() => {
-  window.removeEventListener('keydown', onKey)
-  if (hideTimer) clearTimeout(hideTimer)
-})
+onUnmounted(() => window.removeEventListener('keydown', onKey))
 
 function onQuit() { router.push('/') }
 </script>

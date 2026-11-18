@@ -11,7 +11,7 @@ const locale = useLocaleStore()
 const arcade = useArcadeStore()
 const { sfx } = useAudio()
 
-const manuals = computed(() => arcade.manuals)
+const manuals = computed(() => arcade.manuals.filter((manual) => manual.pdfPath))
 </script>
 
 <template>
@@ -29,8 +29,8 @@ const manuals = computed(() => arcade.manuals)
     </h1>
     <p class="text-sm text-ink-muted mb-6 max-w-2xl">
       {{ locale.current === 'pt-BR'
-        ? 'Os 7 manuais originais (PDFs). Domínio público nas edições antigas — Usborne liberou as versões para download em usborne.com. Use para comparar com a implementação.'
-        : 'The 7 original manuals (PDFs). Public domain for the older editions — Usborne released the originals for download on usborne.com. Use to compare with the implementation.' }}
+        ? 'Consulte os manuais que deram origem aos jogos da coleção.'
+        : 'Browse the manuals that inspired the games in the collection.' }}
     </p>
 
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -68,8 +68,5 @@ const manuals = computed(() => arcade.manuals)
       </article>
     </div>
 
-    <p class="text-[10px] text-ink-dim mt-6 font-mono">
-      Files served from <code class="text-ink-muted">/public/pdfs/</code> in this site.
-    </p>
   </section>
 </template>

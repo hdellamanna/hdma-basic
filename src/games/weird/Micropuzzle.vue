@@ -55,7 +55,7 @@ const PUZZLES = [
 const idx = ref(0)
 const input = ref('')
 const log = ref<string[]>([])
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 const showHint = ref(false)
 
 function check() {
@@ -101,7 +101,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="status === 'playing' && idx === 0 && log.length === 0" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? '8 mini-puzzles. Resposta curta.' : '8 mini-puzzles. Short answer.' }}
       </p>

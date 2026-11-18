@@ -14,7 +14,7 @@ const iceX = ref(50)
 const iceY = ref(20)
 const turn = ref(0)
 const log = ref<string[]>([])
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 const heading = ref('')
 
 function start() {
@@ -69,7 +69,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="turn === 0 && status === 'playing'" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'Direcione o navio (-10 a +10) para evitar o iceberg em 10 turnos.' : 'Steer the ship (-10 to +10) to avoid the iceberg in 10 turns.' }}
       </p>
