@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent } from 'vue'
+import ManualPage from '../components/ManualPage.vue'
+import { computed, defineAsyncComponent, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { GAMES } from '../data/games'
 import { missions } from '../remasters/catalog'
@@ -15,6 +16,34 @@ const engines = {
   console: () => import('../remasters/ConsoleGame.vue'),
   table: classicGames[game.id],
 }
+const specials = {
+  gustavus: defineAsyncComponent(
+    () => import('../remasters/GustavusGlass.vue'),
+  ),
+  'space-mines': defineAsyncComponent(
+    () => import('../remasters/AstronExchange.vue'),
+  ),
+  'trip-into-the-future': defineAsyncComponent(
+    () => import('../remasters/TimeObservatory.vue'),
+  ),
+}
+const titles: Record<string, [string, string, string, string]> = {
+  gustavus: ['O vitral', 'The stained glass', 'Quadrados', 'Dots and boxes'],
+  'space-mines': [
+    'Bolsa de Astron',
+    'Astron Exchange',
+    'Desarme orbital',
+    'Orbital disposal',
+  ],
+  'trip-into-the-future': [
+    'Observatório do Tempo',
+    'Time Observatory',
+    'Sequência de portais',
+    'Portal sequence',
+  ],
+}
+const special = specials[game.id as keyof typeof specials]
+const showSpecial = ref(Boolean(special))
 const Cabinet = defineAsyncComponent(engines[mission.kind])
 const rule = computed(() => mission.rule[locale.isPt ? 0 : 1])
 </script>
@@ -42,10 +71,19 @@ const rule = computed(() => mission.rule[locale.isPt ? 0 : 1])
       />
       <div>
         <h1>{{ game.i18n[locale.current].title }}</h1>
-        <p>{{ rule }}</p>
+        <p v-if="!showSpecial">{{ rule }}</p>
       </div>
     </header>
-    <Cabinet :id="game.id" :remastered="true" />
+    <div v-if="special" class="mission-picker">
+      <button :aria-pressed="showSpecial" @click="showSpecial = true">
+        {{ titles[game.id][locale.isPt ? 0 : 1] }}
+      </button>
+      <button :aria-pressed="!showSpecial" @click="showSpecial = false">
+        {{ titles[game.id][locale.isPt ? 2 : 3] }}
+      </button>
+    </div>
+    <component v-if="showSpecial" :is="special" />
+    <Cabinet v-else :id="game.id" :remastered="true" />
     <RouterLink
       v-if="game.id === 'moonlander'"
       class="edition-link"
@@ -57,5 +95,6 @@ const rule = computed(() => mission.rule[locale.isPt ? 0 : 1])
           : 'Bonus mission · Lunar Courier'
       }}
     </RouterLink>
+    <ManualPage v-if="game" :game="game" />
   </section>
 </template>
