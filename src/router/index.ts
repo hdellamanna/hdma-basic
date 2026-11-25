@@ -22,6 +22,16 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/LunarCourier.vue'),
   },
   {
+    path: '/remasters',
+    name: 'collection',
+    component: () => import('../views/RemasterCollection.vue'),
+  },
+  {
+    path: '/remasters/:id',
+    name: 'edition',
+    component: () => import('../views/RemasterEdition.vue'),
+  },
+  {
     path: '/downloads',
     name: 'downloads',
     component: () => import('../views/Downloads.vue'),
@@ -45,4 +55,12 @@ export const router = createRouter({
     if (to.hash) return { el: to.hash }
     return { top: 0 }
   },
+})
+
+router.beforeEach(async (to) => {
+  if (to.name !== 'edition') return
+  const { missions } = await import('../remasters/catalog')
+  if (!Object.prototype.hasOwnProperty.call(missions, String(to.params.id))) {
+    return { name: 'collection' }
+  }
 })

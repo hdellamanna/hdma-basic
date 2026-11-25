@@ -98,6 +98,8 @@ function onKey(e: KeyboardEvent) {
 }
 
 function start() {
+  lastShot = -Infinity
+  lastMove = 0
   score.value = 0
   lives.value = 3
   wave.value = 0

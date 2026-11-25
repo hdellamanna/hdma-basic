@@ -27,7 +27,9 @@ function start() {
   shipX.value = W / 2
   shipY.value = H - 30
   pirates.value = []
-  for (let i = 0; i < 3; i++) pirates.value.push({ x: 60 + i * 100, y: 40 + Math.random() * 40, alive: true, vx: 1.5 })
+  lastShot = -Infinity
+  lastP = 0
+  for (let i = 0; i < 5; i++) pirates.value.push({ x: 40 + i * 60, y: 40 + Math.random() * 40, alive: true, vx: 1.5 })
   bullets.value = []
   pBullets.value = []
   score.value = 0

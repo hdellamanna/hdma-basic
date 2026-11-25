@@ -23,14 +23,17 @@ function start() {
   turns.value = 0
   status.value = 'playing'
   astronauts.value = []
+  let previous = player.value
+  const cells = Array.from({ length: W * H }, (_, index) => ({ x: index % W, y: Math.floor(index / W) }))
+    .filter(cell => cell.x !== previous.x || cell.y !== previous.y)
   for (let i = 0; i < 5; i++) {
-    let x, y
-    do {
-      x = Math.floor(Math.random() * W)
-      y = Math.floor(Math.random() * H)
-    } while ((x === 5 && y === 5) || astronauts.value.some((a) => a.x === x && a.y === y))
-    astronauts.value.push({ x, y, rescued: false })
+    const reachable = cells.filter(cell => Math.abs(cell.x - previous.x) + Math.abs(cell.y - previous.y) <= maxTurns / 5)
+    const next = reachable[Math.floor(Math.random() * reachable.length)]
+    cells.splice(cells.indexOf(next), 1)
+    astronauts.value.push({ ...next, rescued: false })
+    previous = next
   }
+
 }
 
 function move(dx: number, dy: number) {

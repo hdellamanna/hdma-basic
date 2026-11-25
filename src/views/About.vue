@@ -63,10 +63,10 @@ const { sfx } = useAudio()
       </h2>
       <ul class="list-none space-y-1 text-sm">
         <li v-if="locale.current === 'pt-BR'">
-          <strong class="phosphor">{{ games }} jogos</strong> e uma oficina de programação em Logo.
+          <strong class="phosphor">{{ games }} jogos</strong> em edições clássicas e remasterizadas, além da oficina de Logo.
         </li>
         <li v-else>
-          <strong class="phosphor">{{ games }} games</strong> and a Logo programming workshop.
+          <strong class="phosphor">{{ games }} games</strong> in classic and remastered editions, plus a Logo workshop.
         </li>
         <li v-if="locale.current === 'pt-BR'">
           <strong class="phosphor">{{ manuals }} manuais</strong> disponíveis para download (PDF).
@@ -122,7 +122,7 @@ const { sfx } = useAudio()
 
       <p class="pt-4">
         <a
-          href="https://github.com/hdellamanna"
+          href="https://github.com/hdellamanna/hdma-basic"
           target="_blank"
           rel="noopener"
           class="arcade-btn arcade-btn-cyan text-[10px]"

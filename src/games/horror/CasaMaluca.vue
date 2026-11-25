@@ -10,22 +10,20 @@ const locale = useLocaleStore()
 const { sfx } = useAudio()
 
 const doors = ref<{ x: number; dir: number }[]>([
-  { x: 5, dir: 1 },
+  { x: 3, dir: 1 },
   { x: 5, dir: -1 },
-  { x: 5, dir: 0 },
+  { x: 7, dir: -1 },
 ])
-const target = ref({ x: 5, y: 0 })
 const ghostDist = ref(40)
 const log = ref<string[]>([])
 const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 
 function start() {
   doors.value = [
-    { x: 5, dir: 1 },
+    { x: 3, dir: 1 },
     { x: 5, dir: -1 },
-    { x: 5, dir: 0 },
+    { x: 7, dir: -1 },
   ]
-  target.value = { x: 5, y: 0 }
   ghostDist.value = 40
   log.value = []
   status.value = 'playing'
@@ -34,7 +32,9 @@ function start() {
 
 function flip(idx: number) {
   if (status.value !== 'playing') return
-  doors.value[idx].dir *= -1
+  const door = doors.value[idx]
+  if (door.x + door.dir < 0 || door.x + door.dir > 10) door.dir *= -1
+  door.x += door.dir
   // Check alignment
   const xs = doors.value.map((d) => d.x)
   if (xs[0] === xs[1] && xs[1] === xs[2]) {
@@ -48,20 +48,6 @@ function flip(idx: number) {
       status.value = 'lost'
       sfx.lose()
     }
-  }
-}
-
-function autoMove() {
-  if (status.value !== 'playing') return
-  // auto-swing doors
-  doors.value.forEach((d) => {
-    d.x += d.dir
-    if (d.x < 0 || d.x > 10) d.dir *= -1
-  })
-  ghostDist.value -= 1
-  if (ghostDist.value <= 0) {
-    status.value = 'lost'
-    sfx.lose()
   }
 }
 
@@ -97,8 +83,8 @@ function onQuit() { router.push('/') }
         <div
           v-for="(d, i) in doors"
           :key="i"
-          class="absolute top-1/2 -translate-y-1/2 h-12 w-2 bg-phosphor-green shadow-neon-green transition-all"
-          :style="{ left: `${d.x * 10}%` }"
+          class="absolute h-6 w-2 bg-phosphor-green shadow-neon-green transition-all"
+          :style="{ left: `calc(${d.x * 10}% - ${d.x * 0.8}px)`, top: `${12 + i * 28}%` }"
         ></div>
         <div
           v-if="ghostDist < 20"

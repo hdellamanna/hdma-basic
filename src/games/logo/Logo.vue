@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const edition = defineProps<{ remastered?: boolean }>()
 /**
  * Logo Language — full turtle graphics interpreter
  * Reconstructed from Apple Logo II / LogoWriter (1985).
@@ -24,7 +25,8 @@ const state = ref<TurtleState>({
 const log = ref<string[]>([])
 const labels = ref<{ text: string; x: number; y: number }[]>([])
 const started = ref(false)
-const input = ref('')
+const rosette = 'REPEAT 12 [REPEAT 4 [FD 55 RT 90] RT 30]'
+const input = ref(edition.remastered ? rosette : '')
 const programs = ref<{ name: string; code: string }[]>([
   { name: 'SQUARE', code: 'TO SQUARE :S\nREPEAT 4 [FD :S RT 90]\nEND' },
   { name: 'STAR', code: 'TO STAR :S\nREPEAT 5 [FD :S RT 144]\nEND' },
@@ -143,64 +145,11 @@ function setupCanvas() {
     },
     onTurtle: (s) => {
       state.value = { ...s }
-      drawTurtle(s)
     },
     wait: (ms) => new Promise<void>((resolve) => setTimeout(resolve, ms)),
   })
   interp.reset()
   started.value = true
-}
-
-function drawTurtle(s: TurtleState) {
-  const canvas = canvasRef.value
-  if (!canvas) return
-  const ctx = canvas.getContext('2d')
-  if (!ctx) return
-  // re-clear with grid (cheap: just redraw turtle on a small box)
-  // Actually we keep the canvas, just draw turtle on top
-  // For correct render we need to track all paths; for simplicity redraw grid only where turtle is
-  // Better: re-render all labels on top after each turtle move
-  // Simplest: clear a small box, redraw turtle
-  const cx = W / 2 + s.x
-  const cy = H / 2 - s.y
-  const r = 12
-  ctx.save()
-  // Restore background in a square around turtle (small)
-  ctx.fillStyle = '#000000'
-  ctx.fillRect(cx - r - 2, cy - r - 2, (r + 2) * 2, (r + 2) * 2)
-  // Redraw grid in that area
-  ctx.strokeStyle = 'rgba(124, 252, 0, 0.05)'
-  ctx.lineWidth = 1
-  ctx.beginPath()
-  for (let x = cx - r - 2; x < cx + r + 2; x += 40) {
-    ctx.moveTo(x, cy - r - 2); ctx.lineTo(x, cy + r + 2)
-  }
-  for (let y = cy - r - 2; y < cy + r + 2; y += 40) {
-    ctx.moveTo(cx - r - 2, y); ctx.lineTo(cx + r + 2, y)
-  }
-  ctx.stroke()
-  if (s.visible) {
-    // Triangle
-    const rad = (s.heading - 90) * Math.PI / 180
-    const tipX = cx + Math.cos(rad) * r
-    const tipY = cy + Math.sin(rad) * r
-    const leftRad = rad + (140 * Math.PI / 180)
-    const rightRad = rad - (140 * Math.PI / 180)
-    const leftX = cx + Math.cos(leftRad) * r * 0.8
-    const leftY = cy + Math.sin(leftRad) * r * 0.8
-    const rightX = cx + Math.cos(rightRad) * r * 0.8
-    const rightY = cy + Math.sin(rightRad) * r * 0.8
-    ctx.fillStyle = s.color
-    ctx.strokeStyle = s.color
-    ctx.lineWidth = 2
-    ctx.beginPath()
-    ctx.moveTo(tipX, tipY)
-    ctx.lineTo(leftX, leftY)
-    ctx.lineTo(rightX, rightY)
-    ctx.closePath()
-    ctx.fill()
-  }
-  ctx.restore()
 }
 
 function appendLog(msg: string) {
@@ -258,6 +207,7 @@ function onKeyUp(e: KeyboardEvent) {
 onMounted(async () => {
   await nextTick()
   setupCanvas()
+  if (edition.remastered) await runCode(rosette)
 })
 
 watch(() => locale.current, () => {
@@ -278,13 +228,13 @@ defineExpose({ clearAll })
 
     <!-- Canvas -->
     <div class="crt-frame p-2 bg-black">
-      <canvas
-        ref="canvasRef"
-        :width="W"
-        :height="H"
-        class="block w-full max-w-full"
-        :style="{ aspectRatio: `${W}/${H}` }"
-      />
+      <div class="relative">
+        <canvas ref="canvasRef" :width="W" :height="H" class="block w-full" />
+        <svg class="absolute inset-0 w-full h-full pointer-events-none" :viewBox="`0 0 ${W} ${H}`" aria-hidden="true">
+          <polygon v-if="state.visible" points="0,-12 -6,7.5 6,7.5" :fill="state.color"
+            :transform="`translate(${W / 2 + state.x} ${H / 2 - state.y}) rotate(${state.heading})`" />
+        </svg>
+      </div>
     </div>
 
     <!-- Status + buttons -->

@@ -16,19 +16,19 @@ const MAZE = [
   '0001010100',
   '0111010110',
   '0100000100',
-  '0101111011',
+  '0101111010',
   '0001000090',
 ]
 const W = 10, H = 7
 const player = ref({ x: 0, y: 0 })
-const ghost = ref({ x: 5, y: 3 })
+const ghost = ref({ x: 6, y: 3 })
 const dir = ref(1) // 1=N 2=E 3=S 4=W
 const moves = ref(0)
 const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 
 function start() {
   player.value = { x: 0, y: 0 }
-  ghost.value = { x: 5, y: 3 }
+  ghost.value = { x: 6, y: 3 }
   dir.value = 1
   moves.value = 0
   status.value = 'playing'
@@ -87,14 +87,17 @@ onMounted(() => window.addEventListener('keydown', onKey))
 onUnmounted(() => window.removeEventListener('keydown', onKey))
 
 const view = computed(() => {
-  const r = []
-  for (let i = 0; i < 4; i++) {
-    const dy = [-1, 0, 1]
-    const dx = [-1, 0, 1]
-    const ny = player.value.y + dy[i === 3 ? 2 : i === 1 ? 0 : 1] // 3 cells in front
-    r.push({ y: ny, cells: [0, 1, 2].map((c) => MAZE[ny]?.[player.value.x + dx[c]] ?? '1') })
-  }
-  return r
+  const dx = [0, 1, 0, -1][dir.value - 1]
+  const dy = [-1, 0, 1, 0][dir.value - 1]
+  return [3, 2, 1].map((depth) => ({
+    cells: [-1, 0, 1].map((side) => {
+      const x = player.value.x + depth * dx - side * dy
+      const y = player.value.y + depth * dy + side * dx
+      if (ghost.value.x === x && ghost.value.y === y) return 'G'
+      const tile = MAZE[y]?.[x]
+      return tile === '0' ? '·' : tile === '9' ? '+' : '#'
+    }),
+  }))
 })
 
 function onQuit() { router.push('/') }
@@ -116,9 +119,9 @@ function onQuit() { router.push('/') }
     <div v-else class="font-mono space-y-2">
       <p class="text-cyan text-xs">MOVES <span class="text-amber">{{ moves }}</span></p>
       <div class="bg-void-deep border border-surface-600 p-3 text-center phosphor font-display text-3xl space-y-1">
-        <p>██ {{ view[0]?.cells[1] === '1' ? '#' : view[0]?.cells[1] === '9' ? '+' : '·' }} ██</p>
-        <p>██ {{ view[1]?.cells[0] === '1' ? '#' : view[1]?.cells[0] === '9' ? '+' : '·' }}{{ view[1]?.cells[1] === '1' ? '#' : view[1]?.cells[1] === '9' ? '+' : '·' }}{{ view[1]?.cells[2] === '1' ? '#' : view[1]?.cells[2] === '9' ? '+' : '·' }} ██</p>
-        <p>██ {{ view[2]?.cells[1] === '1' ? '#' : view[2]?.cells[1] === '9' ? '+' : '·' }} ██</p>
+        <p>██ {{ view[0].cells[1] }} ██</p>
+        <p>██ {{ view[1].cells.join('') }} ██</p>
+        <p>██ {{ view[2].cells[1] }} ██</p>
       </div>
       <div class="grid grid-cols-3 gap-1">
         <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-1.5" @click="turnLeft">N ←</button>

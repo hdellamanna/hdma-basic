@@ -9,14 +9,17 @@ const router = useRouter()
 const locale = useLocaleStore()
 const { sfx } = useAudio()
 
-const phase = ref<'count' | 'wait' | 'draw' | 'result'>('count')
+const phase = ref<'idle' | 'count' | 'draw' | 'result'>('idle')
 const log = ref<string[]>([])
 const status = ref<'playing' | 'won' | 'lost'>('playing')
 
 let drawTimer: number | null = null
+const reactionWindowMs = 700
 let startTime = 0
 
 function start() {
+  if (drawTimer !== null) clearTimeout(drawTimer)
+  status.value = 'playing'
   phase.value = 'count'
   log.value = ['1...2...3...4...5...6...7...8...9...10']
   sfx.tick()
@@ -26,7 +29,14 @@ function start() {
     phase.value = 'draw'
     startTime = performance.now()
     sfx.start()
+    drawTimer = window.setTimeout(tooLate, reactionWindowMs)
   }, delay)
+}
+
+function tooLate() {
+  phase.value = 'result'
+  status.value = 'lost'
+  sfx.lose()
 }
 
 function shoot() {
@@ -41,20 +51,19 @@ function shoot() {
   }
   if (phase.value !== 'draw') return
   const reaction = performance.now() - startTime
-  if (reaction < 100) {
-    log.value.push(locale.current === 'pt-BR' ? `CEDO DEMAIS (${reaction.toFixed(0)}ms) — você perdeu.` : `TOO EARLY (${reaction.toFixed(0)}ms) — you lose.`)
-    status.value = 'lost'
-    sfx.lose()
-  } else {
-    log.value.push(locale.current === 'pt-BR' ? `${reaction.toFixed(0)}ms — você atirou primeiro!` : `${reaction.toFixed(0)}ms — you drew first!`)
-    status.value = 'won'
-    sfx.win()
+  if (drawTimer !== null) clearTimeout(drawTimer)
+  if (reaction >= reactionWindowMs) {
+    tooLate()
+    return
   }
+  log.value.push(locale.current === 'pt-BR' ? `${reaction.toFixed(0)}ms — você atirou primeiro!` : `${reaction.toFixed(0)}ms — you drew first!`)
+  status.value = 'won'
+  sfx.win()
   phase.value = 'result'
 }
 
 function onKey(e: KeyboardEvent) {
-  if (e.key === ' ') { e.preventDefault(); shoot() }
+  if (e.key === ' ' && (phase.value === 'count' || phase.value === 'draw')) { e.preventDefault(); shoot() }
 }
 
 onMounted(() => window.addEventListener('keydown', onKey))
@@ -73,7 +82,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="phase === 'count' && log.length === 0" class="text-center py-6">
+    <div v-if="phase === 'idle'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'Dê 10 passos. Atire quando vir HE DRAWS. ESPAÇO.' : 'Take 10 paces. Shoot when HE DRAWS appears. SPACE.' }}
       </p>

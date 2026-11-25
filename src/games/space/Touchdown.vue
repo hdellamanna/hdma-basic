@@ -137,7 +137,7 @@ function onQuit() { router.push('/') }
       <div class="relative h-32 bg-void-deep border border-surface-600 overflow-hidden">
         <div class="absolute bottom-0 inset-x-0 h-2 bg-surface-600"></div>
         <div
-          class="absolute bottom-2 h-3 w-1 danger-phosphor"
+          class="absolute bottom-2 h-3 w-1 bg-danger"
           :style="{ left: `${targetX}%` }"
         ></div>
         <div

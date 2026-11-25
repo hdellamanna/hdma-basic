@@ -31,7 +31,7 @@ const logo = computed(() => arcade.manuals.find((manual) => manual.id === 'apple
           : 'Belle Époque Paris imagined the future. Here it arrived in green phosphor and arcade tokens.' }}</p>
         <div class="pavilion-actions">
           <a class="pavilion-button" href="#classicos">{{ locale.isPt ? 'Jogar clássicos' : 'Play classics' }}</a>
-          <RouterLink class="pavilion-link" :to="{ name: 'remastered' }">
+          <RouterLink class="pavilion-link" :to="{ name: 'collection' }">
             {{ locale.isPt ? 'Explorar Remastered' : 'Explore Remastered' }}
             <span aria-hidden="true">↗</span>
           </RouterLink>

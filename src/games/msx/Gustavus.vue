@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const edition = defineProps<{ remastered?: boolean }>()
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
@@ -24,6 +25,12 @@ function start() {
   horiz.value = Array(SIZE).fill(null).map(() => Array(SIZE - 1).fill(false))
   vert.value = Array(SIZE - 1).fill(null).map(() => Array(SIZE).fill(false))
   boxes.value = Array(SIZE - 1).fill(null).map(() => Array(SIZE - 1).fill(null))
+  if (edition.remastered) {
+    for (let i = 0; i < SIZE - 1; i++) {
+      horiz.value[i][i] = true
+      vert.value[i][SIZE - 1 - i] = true
+    }
+  }
   scores.value = { P: 0, A: 0 }
   turn.value = 'P'
   status.value = 'playing'
@@ -190,6 +197,8 @@ const totalBoxes = (SIZE - 1) * (SIZE - 1)
               height="4"
               :fill="used ? '#ffb000' : 'transparent'"
               class="cursor-pointer hover:fill-amber/30"
+              role="button" :tabindex="used ? -1 : 0" :aria-disabled="used" :aria-label="'H ' + (r+1) + ',' + (c+1)"
+              @keydown.enter.prevent="placeH(r,c)" @keydown.space.prevent="placeH(r,c)"
               @click="placeH(r, c)"
             />
           </g>
@@ -204,6 +213,8 @@ const totalBoxes = (SIZE - 1) * (SIZE - 1)
               height="32"
               :fill="used ? '#ffb000' : 'transparent'"
               class="cursor-pointer hover:fill-amber/30"
+              role="button" :tabindex="used ? -1 : 0" :aria-disabled="used" :aria-label="'V ' + (r+1) + ',' + (c+1)"
+              @keydown.enter.prevent="placeV(r,c)" @keydown.space.prevent="placeV(r,c)"
               @click="placeV(r, c)"
             />
           </g>

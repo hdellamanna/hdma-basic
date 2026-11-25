@@ -20,7 +20,8 @@ const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 function start() {
   tries.value = 8
   used.value = Array(10).fill(false)
-  used.value[0] = true // zero is always available
+  a.value = ''
+  b.value = ''
   log.value = []
   status.value = 'playing'
   roll()
@@ -39,6 +40,7 @@ function roll() {
 }
 
 function submit() {
+  if (status.value !== 'playing') return
   const x = parseInt(a.value, 10)
   const y = parseInt(b.value, 10)
   if (isNaN(x) || isNaN(y) || x < 0 || x > 9 || y < 0 || y > 9) {
@@ -57,8 +59,8 @@ function submit() {
     log.value.push(locale.current === 'pt-BR' ? `✗ ${x}+${y}≠${d1.value + d2.value}` : `✗ ${x}+${y}≠${d1.value + d2.value}`)
     return
   }
-  used.value[x] = true
-  used.value[y] = true
+  if (x !== 0) used.value[x] = true
+  if (y !== 0) used.value[y] = true
   a.value = ''
   b.value = ''
   sfx.coin()
@@ -68,6 +70,13 @@ function submit() {
     sfx.win()
     return
   }
+  nextTurn()
+}
+
+function nextTurn() {
+  a.value = ''
+  b.value = ''
+  if (status.value !== 'playing') return
   tries.value--
   if (tries.value <= 0) {
     status.value = 'lost'
@@ -102,7 +111,7 @@ function onQuit() { router.push('/') }
           :disabled="used[i]"
           class="aspect-square text-amber border border-surface-600 phosphor"
           :class="used[i] ? 'opacity-30 line-through' : 'hover:bg-phosphor-green/20'"
-          @click="a = String(n)"
+          @click="a === '' ? a = String(n) : b = String(n)"
         >{{ n }}</button>
       </div>
       <div class="flex items-center gap-2">
@@ -112,7 +121,8 @@ function onQuit() { router.push('/') }
         <span class="text-cyan">=</span>
         <span class="text-amber text-2xl font-display w-12 text-center">{{ d1 + d2 }}</span>
       </div>
-      <button class="arcade-btn arcade-btn-amber w-full" @click="submit">▶ SUBMIT</button>
+      <button v-if="status === 'playing'" class="arcade-btn w-full" @click="nextTurn">{{ locale.current === 'pt-BR' ? 'Passar vez' : 'Pass turn' }}</button>
+      <button v-if="status === 'playing'" class="arcade-btn arcade-btn-amber w-full" @click="submit">▶ SUBMIT</button>
       <div class="border border-surface-600 bg-surface-800 p-2 h-16 overflow-y-auto text-xs space-y-0.5">
         <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
       </div>

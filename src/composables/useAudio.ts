@@ -23,7 +23,7 @@ function ensureCtx(): AudioContext | null {
     }
   }
   if (ctx && ctx.state === 'suspended') {
-    void ctx.resume()
+    void ctx.resume().catch(() => { /* Browser audio may require another user gesture. */ })
   }
   return ctx
 }

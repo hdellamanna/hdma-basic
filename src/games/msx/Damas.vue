@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const edition = defineProps<{ remastered?: boolean }>()
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
@@ -14,6 +15,7 @@ type Piece = { color: 'r' | 'b' | 'R' | 'B' | null } // r/b normal, R/B king
 const board = ref<Piece[][]>([])
 const turn = ref<'r' | 'b'>('r')
 const selected = ref<{ r: number; c: number } | null>(null)
+const continuingJump = ref(false)
 const validMoves = ref<{ r: number; c: number; jump?: { r: number; c: number } }[]>([])
 const log = ref<string[]>([])
 const status = ref<'playing' | 'won' | 'lost'>('playing')
@@ -21,6 +23,13 @@ const { schedule, cancel } = useRoundTimer()
 
 function initBoard() {
   board.value = Array(8).fill(null).map(() => Array(8).fill(null))
+  if (edition.remastered) {
+    board.value[5][0] = { color: 'R' }
+    board.value[6][3] = { color: 'r' }
+    board.value[4][1] = { color: 'b' }
+    board.value[2][5] = { color: 'B' }
+    return
+  }
   for (let r = 0; r < 3; r++) {
     for (let c = 0; c < 8; c++) {
       if ((r + c) % 2 === 1) board.value[r][c] = { color: 'b' }
@@ -36,6 +45,7 @@ function initBoard() {
 function start() {
   cancel()
   initBoard()
+  continuingJump.value = false
   turn.value = 'r'
   selected.value = null
   validMoves.value = []
@@ -72,6 +82,7 @@ function select(r: number, c: number) {
   if (status.value !== 'playing' || turn.value !== 'r') return
   const p = board.value[r][c]
   if (p && p.color.toLowerCase() === turn.value) {
+    if (continuingJump.value) return
     selected.value = { r, c }
     validMoves.value = availableMoves().filter(({ from }) => from.r === r && from.c === c).map(({ mv }) => mv)
     sfx.select()
@@ -96,6 +107,15 @@ function move(mv: { r: number; c: number; jump?: { r: number; c: number } }) {
   // King promotion
   if (piece.color === 'r' && mv.r === 0) board.value[mv.r][mv.c] = { color: 'R' }
   if (piece.color === 'b' && mv.r === 7) board.value[mv.r][mv.c] = { color: 'B' }
+  const promoted = board.value[mv.r][mv.c]!.color !== piece.color
+  const jumps = mv.jump && !promoted ? getMoves(mv.r, mv.c).filter(next => next.jump) : []
+  continuingJump.value = jumps.length > 0
+  if (continuingJump.value) {
+    selected.value = { r: mv.r, c: mv.c }
+    validMoves.value = jumps
+    if (turn.value === 'b') schedule(() => move(jumps[Math.floor(Math.random() * jumps.length)]), 500)
+    return
+  }
   selected.value = null
   validMoves.value = []
   // Check win
@@ -137,7 +157,7 @@ function aiMove(allMoves: ReturnType<typeof availableMoves>) {
 
 function onKey(e: KeyboardEvent) {
   if (status.value !== 'playing') return
-  if (e.key === 'Escape') {
+  if (e.key === 'Escape' && !continuingJump.value) {
     selected.value = null
     validMoves.value = []
   }
@@ -166,7 +186,8 @@ function onQuit() { router.push('/') }
       <p class="text-xs text-amber">TURN: <span :class="turn === 'r' ? 'text-danger' : 'text-ink'">{{ turn === 'r' ? (locale.current === 'pt-BR' ? 'VERMELHO' : 'RED') : (locale.current === 'pt-BR' ? 'PRETO' : 'BLACK') }}</span></p>
       <div class="grid grid-cols-8 gap-0 bg-void-deep border border-surface-600 mx-auto" style="max-width: 360px;">
         <template v-for="(row, r) in board" :key="`r-${r}`">
-          <div
+          <button type="button"
+            :aria-label="String.fromCharCode(65 + c) + (8 - r) + (piece ? ' · ' + (piece.color.toLowerCase() === 'r' ? (locale.isPt ? 'vermelha' : 'red') : (locale.isPt ? 'preta' : 'black')) : '')"
             v-for="(piece, c) in row"
             :key="`c-${r}-${c}`"
             class="aspect-square grid place-items-center cursor-pointer"
@@ -182,7 +203,7 @@ function onQuit() { router.push('/') }
               class="w-3/4 h-3/4 rounded-full border-2 font-display text-xs grid place-items-center"
               :class="piece.color.toLowerCase() === 'r' ? 'bg-danger border-amber text-amber' : 'bg-surface-800 border-ink text-ink'"
             >{{ piece.color === piece.color.toUpperCase() ? '★' : '' }}</span>
-          </div>
+          </button>
         </template>
       </div>
       <p v-if="status === 'won'" class="amber-phosphor text-shadow-neon font-display text-center">★ VOCÊ VENCEU ★</p>

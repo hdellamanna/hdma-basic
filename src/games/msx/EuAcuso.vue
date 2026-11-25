@@ -12,10 +12,10 @@ const { sfx } = useAudio()
 const SUSPECTS = computed(() => {
   const r = locale.current
   return [
-    { name: r === 'pt-BR' ? 'Sr. Silva' : 'Mr. Smith', alibi: 'library', guilty: false },
-    { name: r === 'pt-BR' ? 'Sra. Jones' : 'Mrs. Jones', alibi: 'kitchen', guilty: true },
-    { name: r === 'pt-BR' ? 'Dr. Costa' : 'Dr. Brown', alibi: 'study', guilty: false },
-    { name: r === 'pt-BR' ? 'Srta. Lima' : 'Miss Lee', alibi: 'garden', guilty: false },
+    { name: r === 'pt-BR' ? 'Sr. Silva' : 'Mr. Smith', alibi: 'library' },
+    { name: r === 'pt-BR' ? 'Sra. Jones' : 'Mrs. Jones', alibi: 'kitchen' },
+    { name: r === 'pt-BR' ? 'Dr. Costa' : 'Dr. Brown', alibi: 'study' },
+    { name: r === 'pt-BR' ? 'Srta. Lima' : 'Miss Lee', alibi: 'garden' },
   ]
 })
 
@@ -45,7 +45,7 @@ function start() {
 }
 
 function interrogate(name: string) {
-  if (!target.value) return
+  if (!target.value || status.value !== 'playing') return
   const sus = SUSPECTS.value.find((s) => s.name.toLowerCase().includes(name.toLowerCase()))
   if (!sus) {
     log.value.push(locale.current === 'pt-BR' ? 'Não há essa pessoa.' : 'No such person.')
@@ -53,21 +53,24 @@ function interrogate(name: string) {
   }
   tries.value++
   sfx.type()
-  if (sus.guilty) {
+  if (sus.alibi === target.value.suspect.alibi) {
     log.value.push(`${sus.name}: "${locale.current === 'pt-BR' ? 'Eu estava...' : 'I was...'}" (hesita)`)
   } else {
-    log.value.push(`${sus.name}: "${locale.current === 'pt-BR' ? 'Eu estava na ' + sus.alibi : 'I was in the ' + sus.alibi}"`)
+    const weapon = target.value.weapon.name[locale.current]
+    log.value.push(locale.current === 'pt-BR'
+      ? `${sus.name}: "Eu estava em ${sus.alibi}. Vi a arma: ${weapon}."`
+      : `${sus.name}: "I was in the ${sus.alibi}. I saw the weapon: ${weapon}."`)
   }
 }
 
 function accuse() {
-  if (!target.value) return
+  if (!target.value || status.value !== 'playing') return
   const parts = input.value.toLowerCase().split(/\s+/)
   const susName = parts.slice(1).join(' ')
   const wepName = parts[0]
   const sus = SUSPECTS.value.find((s) => s.name.toLowerCase().includes(susName))
   const wep = WEAPONS.find((w) => w.name[locale.current].toLowerCase().includes(wepName) || wepName.includes(w.name[locale.current].toLowerCase()))
-  if (sus && sus.guilty && wep === target.value.weapon) {
+  if (susName && wepName && sus?.alibi === target.value.suspect.alibi && wep?.name.en === target.value.weapon.name.en) {
     status.value = 'won'
     sfx.win()
   } else {
@@ -110,7 +113,7 @@ function onQuit() { router.push('/') }
           :key="s.name"
           class="arcade-btn-ghost border border-surface-600 text-[10px] py-1"
           @click="interrogate(s.name)"
-        >?</button>
+        >{{ s.name }}</button>
       </div>
       <form v-if="status === 'playing'" class="flex gap-1" @submit.prevent="accuse">
         <input

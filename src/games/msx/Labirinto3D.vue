@@ -15,12 +15,12 @@ const MAZE = [
   '0001010100',
   '0111010110',
   '0100000100',
-  '0101111011',
+  '0101111010',
   '0001000090',
 ]
 const W = 10, H = 7
 const player = ref({ x: 0, y: 0 })
-const bull = ref({ x: 5, y: 3 })
+const bull = ref({ x: 6, y: 3 })
 const dir = ref(1)
 const moves = ref(0)
 const bullSteps = ref(8)
@@ -28,7 +28,7 @@ const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 
 function start() {
   player.value = { x: 0, y: 0 }
-  bull.value = { x: 5, y: 3 }
+  bull.value = { x: 6, y: 3 }
   dir.value = 1
   moves.value = 0
   bullSteps.value = 8
@@ -93,8 +93,8 @@ const view = computed(() => {
   const dx = [0, 1, 0, -1]
   const dy = [-1, 0, 1, 0]
   const f = { x: player.value.x + dx[dir.value - 1], y: player.value.y + dy[dir.value - 1] }
-  const r = { x: dx[(dir.value + 1) % 4], y: dy[(dir.value + 1) % 4] }
-  const l = { x: dx[(dir.value + 3) % 4], y: dy[(dir.value + 3) % 4] }
+  const r = { x: dx[dir.value % 4], y: dy[dir.value % 4] }
+  const l = { x: dx[(dir.value + 2) % 4], y: dy[(dir.value + 2) % 4] }
   return [
     { cell: f, txt: MAZE[f.y]?.[f.x] ?? '1', bull: bull.value.x === f.x && bull.value.y === f.y },
     { cell: { x: player.value.x + l.x, y: player.value.y + l.y }, txt: MAZE[player.value.y + l.y]?.[player.value.x + l.x] ?? '1' },

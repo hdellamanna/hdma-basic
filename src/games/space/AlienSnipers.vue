@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
 import { useAudio } from '../../composables/useAudio'
@@ -9,7 +9,7 @@ const router = useRouter()
 const locale = useLocaleStore()
 const { sfx } = useAudio()
 
-const targets = ref<{ id: number; x: number; y: number; ttl: number }[]>([])
+const targets = ref<{ id: number; x: number; y: number; expiresAt: number }[]>([])
 const score = ref(0)
 const hits = ref(0)
 const timeLeft = ref(60)
@@ -27,25 +27,24 @@ function spawnTarget() {
     id: Date.now() + Math.random(),
     x: 20 + Math.random() * (cw - 60),
     y: 20 + Math.random() * (ch - 60),
-    ttl: 1200 + Math.random() * 1000,
+    expiresAt: performance.now() + 1200 + Math.random() * 1000,
   })
 }
 
 function loop() {
   if (status.value !== 'playing') return
   const now = performance.now()
+  for (let i = targets.value.length - 1; i >= 0; i--) {
+    if (targets.value[i].expiresAt <= now) targets.value.splice(i, 1)
+  }
   if (now - lastSpawn > 600) {
     lastSpawn = now
     if (targets.value.length < 4) spawnTarget()
   }
-  // Decrease TTL
-  targets.value = targets.value
-    .map((t) => ({ ...t, ttl: t.ttl - 16 }))
-    .filter((t) => t.ttl > 0)
   frame = requestAnimationFrame(loop)
 }
 
-function onClick(t: { id: number; x: number; y: number; ttl: number }) {
+function onClick(t: { id: number; x: number; y: number; expiresAt: number }) {
   if (status.value !== 'playing') return
   targets.value = targets.value.filter((x) => x.id !== t.id)
   score.value += 10
@@ -78,7 +77,6 @@ function start() {
   frame = requestAnimationFrame(loop)
 }
 
-onMounted(() => {})
 onUnmounted(() => {
   if (timer) clearInterval(timer)
   if (frame !== null) cancelAnimationFrame(frame)

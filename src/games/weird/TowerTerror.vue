@@ -11,7 +11,7 @@ const { sfx } = useAudio()
 
 const room = ref(0)
 const floor = ref(0)
-const time = ref(9)
+const time = ref(21 * 60)
 const pulse = ref(50)
 const log = ref<string[]>([])
 const status = ref<'playing' | 'won' | 'lost'>('playing')
@@ -21,7 +21,7 @@ const NASTIES = ['skeleton', 'ghost', 'headless axeman']
 function start() {
   room.value = 0
   floor.value = 0
-  time.value = 9
+  time.value = 21 * 60
   pulse.value = 50
   log.value = [locale.current === 'pt-BR' ? 'Suba os andares antes da meia-noite.' : 'Climb the floors before midnight.']
   status.value = 'playing'
@@ -34,7 +34,8 @@ function go() {
     floor.value++
     room.value = 0
   }
-  time.value += 1 + Math.floor(Math.random() * 3)
+  advanceClock()
+  if (status.value !== 'playing') return
   if (Math.random() < 0.6) {
     const nasty = NASTIES[Math.floor(Math.random() * NASTIES.length)]
     pulse.value += 10 + Math.floor(Math.random() * 20)
@@ -47,10 +48,6 @@ function go() {
     log.value.push(locale.current === 'pt-BR' ? '✕ Você enlouqueceu e saltou.' : '✕ You went mad.')
     status.value = 'lost'
     sfx.lose()
-  } else if (time.value >= 12) {
-    log.value.push(locale.current === 'pt-BR' ? '✕ Meia-noite.' : '✕ Midnight.')
-    status.value = 'lost'
-    sfx.lose()
   } else if (floor.value >= 6) {
     log.value.push(locale.current === 'pt-BR' ? '★ Tesouros! Pulso: ' + pulse.value : '★ Treasure! Pulse: ' + pulse.value)
     status.value = 'won'
@@ -58,10 +55,25 @@ function go() {
   }
 }
 
+function advanceClock() {
+  time.value += 1 + Math.floor(Math.random() * 3)
+  if (time.value >= 24 * 60) {
+    log.value.push(locale.current === 'pt-BR' ? '✕ Meia-noite.' : '✕ Midnight.')
+    status.value = 'lost'
+    sfx.lose()
+  }
+}
+
 function retreat() {
   if (status.value !== 'playing') return
   pulse.value = Math.max(40, pulse.value - 5)
-  room.value = Math.max(0, room.value - 1)
+  if (room.value === 0 && floor.value > 0) {
+    floor.value--
+    room.value = 4
+  } else {
+    room.value = Math.max(0, room.value - 1)
+  }
+  advanceClock()
   sfx.tick()
 }
 
@@ -99,7 +111,7 @@ function onQuit() { router.push('/') }
         </div>
         <div class="border border-surface-600 bg-surface-800 p-2 text-center">
           <div class="text-ink-dim text-[9px]">TIME</div>
-          <div :class="time >= 11 ? 'danger-phosphor' : 'amber-phosphor'">{{ time }}PM</div>
+          <div :class="time >= 23 * 60 ? 'danger-phosphor' : 'amber-phosphor'">{{ Math.floor(time / 60) % 24 }}:{{ String(time % 60).padStart(2, '0') }}</div>
         </div>
         <div class="border border-surface-600 bg-surface-800 p-2 text-center">
           <div class="text-ink-dim text-[9px]">PULSE</div>

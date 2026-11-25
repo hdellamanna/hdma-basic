@@ -46,17 +46,17 @@ function nextRound() {
   }, visible)
 }
 
+function hit(quadrant: number) {
+  if (status.value !== 'playing' || !active.value || quadrant !== target.value) return
+  const reaction = performance.now() - startTime.value
+  score.value += Math.max(0, Math.floor(100 - reaction / 10))
+  sfx.hit()
+  active.value = false
+  schedule(nextRound, 200)
+}
+
 function onKey(e: KeyboardEvent) {
-  if (status.value !== 'playing') return
-  if (!active.value) return
-  const k = parseInt(e.key, 10)
-  if (k >= 1 && k <= 4 && k === target.value) {
-    const reaction = performance.now() - startTime.value
-    score.value += Math.max(0, Math.floor(100 - reaction / 10))
-    sfx.hit()
-    active.value = false
-    schedule(nextRound, 200)
-  }
+  hit(Number(e.key))
 }
 
 function start() {
@@ -83,19 +83,20 @@ function onQuit() { router.push('/') }
     <div v-if="status === 'playing' && round === 0" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR'
-          ? 'Pressione 1, 2, 3 ou 4 quando os olhos aparecem no quadrante certo.'
-          : 'Press 1, 2, 3 or 4 when eyes appear in the matching quadrant.' }}
+          ? 'Toque no quadrante dos olhos ou pressione 1, 2, 3 ou 4.'
+          : 'Tap the quadrant with the eyes or press 1, 2, 3 or 4.' }}
       </p>
       <button class="arcade-btn arcade-btn-amber" @click="start">▶ START</button>
     </div>
     <div v-else-if="status === 'playing'" class="relative w-full h-[60vh] min-h-[360px] bg-void-deep">
       <div class="absolute inset-0 grid grid-cols-2 grid-rows-2">
-        <div v-for="(p, i) in POSITIONS" :key="i" class="border border-surface-700/50"></div>
+        <button v-for="(_, i) in POSITIONS" :key="i" type="button" :aria-label="String(i + 1)"
+          class="border border-surface-700/50" @click="hit(i + 1)"></button>
       </div>
       <transition name="bug">
         <div
           v-if="active"
-          class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
+          class="absolute pointer-events-none -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
           :style="{ top: targetPos.top, left: targetPos.left }"
         >
           <div class="flex gap-2">
