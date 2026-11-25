@@ -166,6 +166,7 @@ function difficultyLabel(d: number) {
           >
             ▶ {{ t('playGame', locale.current) }}
           </button>
+          <RouterLink class="edition-link" :to="{ name: 'edition', params: { id: game.id } }">Remastered ↗</RouterLink>
         </article>
       </div>
     </div>

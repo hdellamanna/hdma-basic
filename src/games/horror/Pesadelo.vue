@@ -24,20 +24,25 @@ const INSULTS = computed(() => {
 })
 
 function start() {
+  input.value = ''
   score.value = 300
   log.value = []
   status.value = 'playing'
   nextNumber()
   if (timer) clearInterval(timer)
   timer = window.setInterval(() => {
-    score.value = Math.max(0, score.value - 5)
-    if (score.value <= 0) {
-      log.value.push(locale.current === 'pt-BR' ? '✕ Escravo do computador!' : '✕ Slave of the computer!')
-      status.value = 'lost'
-      sfx.lose()
-      if (timer) clearInterval(timer)
-    }
+    deduct(5)
   }, 2000)
+}
+
+function deduct(amount: number) {
+  score.value = Math.max(0, score.value - amount)
+  if (score.value === 0) {
+    log.value.push(locale.current === 'pt-BR' ? '✕ Escravo do computador!' : '✕ Slave of the computer!')
+    status.value = 'lost'
+    sfx.lose()
+    if (timer) clearInterval(timer)
+  }
 }
 
 function nextNumber() {
@@ -64,9 +69,9 @@ function submit() {
     }
     nextNumber()
   } else {
-    score.value -= 10
     sfx.error()
     log.value.push(`✗ ${v}`)
+    deduct(10)
     input.value = ''
   }
 }

@@ -1,9 +1,10 @@
 # HDMA BASIC · Fliperama 2000
 
-Fliperama de navegador com 58 jogos recriados a partir de oito manuais publicados entre 1982 e 1985, uma oficina de Logo e uma edição Remastered. O salão imagina o ano 2000 a partir da Paris da Belle Époque e dos fliperamas dos anos 1970 e 1980. A interface está disponível em português e inglês.
+Fliperama de navegador com 58 jogos recriados a partir de oito manuais publicados entre 1982 e 1985, uma oficina de Logo, edições remasterizadas para o catálogo inteiro e o jogo extra Correio Lunar. O salão imagina o ano 2000 a partir da Paris da Belle Époque e dos fliperamas dos anos 1970 e 1980. A interface está disponível em português e inglês.
 
 - **Clássicos.** Os jogos dos manuais foram adaptados de BASIC para TypeScript. Os endereços `/play/:manualId/:gameId` abrem a edição clássica. O código de cada jogo é carregado ao iniciar a partida.
-- **Remastered.** Correio Lunar (`/remastered`) é um quebra-cabeça original de navegação e recarga inspirado no tema lunar de Moonlander. Funciona com teclado, mouse e toque. A edição textual do mesmo jogo está disponível em BASIC com linhas numeradas em `public/basic/correio-lunar.bas`. Para executá-la, use `bwbasic public/basic/correio-lunar.bas`.
+- **Remastered.** O salão em `/remasters` permite buscar um título ou manual e abrir a edição de cada jogo. Há expedições por turnos, interceptações em tempo real, desafios de lógica, finais de tabuleiro e uma oficina de rosáceas em Logo.
+- **Jogo extra.** Correio Lunar (`/remastered`) é um quebra-cabeça original de navegação e recarga inspirado no tema lunar de Moonlander. Funciona com teclado, mouse e toque. A edição textual do mesmo jogo está disponível em BASIC com linhas numeradas em `public/basic/correio-lunar.bas`. Para executá-la, use `bwbasic public/basic/correio-lunar.bas`.
 - **Oficina de Logo.** Interpretador de Logo e desenho com a tartaruga em `/play/apple-logo/apple-logo`.
 - **Manuais.** Oito PDFs para consulta em `/downloads`.
 

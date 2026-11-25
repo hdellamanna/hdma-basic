@@ -25,6 +25,7 @@ const HOLE = 'O'
 
 function start() {
   player.value = { x: 10, y: 5 }
+  log.value = []
   holes.value = []
   moves.value = 5
   turn.value = 0
@@ -83,7 +84,8 @@ function move(dx: number, dy: number) {
 }
 
 function dig() {
-  if (moves.value <= 0) {
+  if (status.value !== 'playing') return
+  if (moves.value <= 0 || holes.value.some(h => h.x === player.value.x && h.y === player.value.y)) {
     sfx.error()
     return
   }

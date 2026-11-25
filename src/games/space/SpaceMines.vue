@@ -52,8 +52,9 @@ function move(dx: number, dy: number) {
 
 function defuse() {
   if (status.value !== 'playing') return
-  const m = mines.value.find((mm) => mm.x === player.value.x && mm.y === player.value.y)
-  if (m && !m.defused) {
+  const m = mines.value.find((mine) => !mine.defused
+    && Math.abs(mine.x - player.value.x) + Math.abs(mine.y - player.value.y) === 1)
+  if (m) {
     m.defused = true
     defused.value++
     sfx.powerup()
@@ -91,7 +92,7 @@ function onQuit() { router.push('/') }
   >
     <div v-if="mines.length === 0" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
-        {{ locale.current === 'pt-BR' ? 'Desarme 10 minas. Setas para mover, ESPAÇO para desarmar.' : 'Defuse 10 mines. Arrows to move, SPACE to defuse.' }}
+        {{ locale.current === 'pt-BR' ? 'Desarme 10 minas. Setas para mover, ESPAÇO para desarmar uma mina adjacente.' : 'Defuse 10 mines. Arrows to move, SPACE to defuse an adjacent mine.' }}
       </p>
       <button class="arcade-btn arcade-btn-amber" @click="start">▶ START</button>
     </div>

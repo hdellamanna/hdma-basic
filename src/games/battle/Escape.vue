@@ -30,10 +30,11 @@ const map = ref([
 ])
 // place key and door + exit
 const keyPos = { x: 8, y: 1 }
-const doorPos = { x: 5, y: 4 }
+const doorPos = { x: 9, y: 7 }
 const exitPos = { x: 10, y: 7 }
 
 function start() {
+  map.value[doorPos.y][doorPos.x] = 3
   player.value = { x: 0, y: 4 }
   hasKey.value = false
   turns.value = 0
@@ -54,7 +55,6 @@ function move(dx: number, dy: number) {
   if (nx === keyPos.x && ny === keyPos.y) {
     hasKey.value = true
     sfx.coin()
-    map.value[ny][nx] = 0
   }
   if (tile === 3) {
     map.value[ny][nx] = 0

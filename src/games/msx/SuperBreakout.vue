@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const edition = defineProps<{ remastered?: boolean }>()
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
@@ -23,7 +24,8 @@ function buildBricks() {
   bricks.value = []
   for (let r = 0; r < 5; r++) {
     for (let c = 0; c < 10; c++) {
-      bricks.value.push({ x: 10 + c * 30, y: 20 + r * 20, alive: true })
+      if (edition.remastered && Math.abs(c - 4.5) > r + level.value) continue
+      bricks.value.push({ x: 25 + c * 30, y: 20 + r * 20, alive: true })
     }
   }
 }
@@ -116,23 +118,12 @@ function onQuit() { router.push('/') }
     </div>
     <div v-else class="space-y-2">
       <p class="text-xs text-cyan">LEVEL <span class="text-amber">{{ level }}</span>/3</p>
-      <div class="relative bg-void-deep border border-surface-600 overflow-hidden mx-auto" :style="{ aspectRatio: '8/9', maxWidth: '320px' }">
-        <div
-          v-for="(b, i) in bricks"
-          :key="i"
-          v-show="b.alive"
-          class="absolute amber-phosphor"
-          :style="{ left: `${b.x}px`, top: `${b.y}px`, width: '28px', height: '16px', transform: 'translate(-50%, -50%)' }"
-        ></div>
-        <div
-          class="absolute w-1.5 h-1.5 bg-phosphor-green shadow-neon-green"
-          :style="{ left: `${ball.x}px`, top: `${ball.y}px`, transform: 'translate(-50%, -50%)' }"
-        ></div>
-        <div
-          class="absolute h-1 phosphor shadow-neon-green"
-          :style="{ left: `${paddle.x}px`, bottom: '10px', width: `${paddle.w}px`, transform: 'translateX(-50%)' }"
-        ></div>
-      </div>
+      <svg :viewBox="`0 0 ${W} ${H}`" class="block w-full max-w-[320px] mx-auto bg-void-deep border border-surface-600" role="img" aria-label="Super Breakout">
+        <rect v-for="(brick, i) in bricks" :key="i" v-show="brick.alive"
+          :x="brick.x - 14" :y="brick.y - 8" width="28" height="16" :class="edition.remastered ? 'vitrail-brick' : 'fill-current text-amber'"  />
+        <circle :cx="ball.x" :cy="ball.y" r="3" class="fill-current text-phosphor-green" />
+        <rect :x="paddle.x - paddle.w / 2" :y="H - 17" :width="paddle.w" height="4" class="fill-current text-phosphor-green" />
+      </svg>
       <div class="grid grid-cols-2 gap-1 sm:hidden">
         <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-1" @click="move(-25)">◀</button>
         <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-1" @click="move(25)">▶</button>

@@ -5,7 +5,7 @@
  * Uses 2-word commands: GO/IR [place], FOLLOW/SEGUIR, EXAMINE/EXAMINAR,
  * SAY/DIZER [password], READ/LER, OPEN/ABRIR [num], LEAVE/DEIXAR, WAIT/ESPERAR, TIME/HORA.
  */
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
 import { useAudio } from '../../composables/useAudio'
@@ -45,7 +45,6 @@ const briefcasePlace = ref(1)  // Estação
 const contactPlace = ref(15)  // Biblioteca
 const hasKey = ref(false)
 const hasBriefcase = ref(false)
-const hasMet = ref(false)
 const metContact = ref(false)
 const messageLeft = ref(false)
 const hour = ref(10)  // 10.00
@@ -57,6 +56,7 @@ const input = ref('')
 const status = ref<'playing' | 'won' | 'lost'>('playing')
 
 function start() {
+  input.value = ''
   playerPlace.value = 0
   spyPlace.value = 2
   hasKey.value = false
@@ -83,7 +83,9 @@ function pad(n: number) { return n.toString().padStart(2, '0') }
 function placeName(idx: number) { return placeNames.value[idx] }
 
 function moveTo(place: string) {
-  const target = PLACES.findIndex((p) => p.toLowerCase().startsWith(place.toLowerCase()) || place.toLowerCase().includes(p))
+  const normalize = (name: string) => name.normalize('NFD').replace(/[\u0300-\u036f\s]/g, '').toLowerCase()
+  const name = normalize(place)
+  const target = PLACES.findIndex((id, index) => id === name || normalize(placeName(index)) === name)
   if (target === -1) {
     log.value.push(locale.current === 'pt-BR' ? `✗ Lugar "${place}" desconhecido` : `✗ Place "${place}" unknown`)
     sfx.error()
@@ -94,18 +96,18 @@ function moveTo(place: string) {
     sfx.error()
     return
   }
+  const previous = playerPlace.value
   playerPlace.value = target
   advanceTime(15)
-  sfx.tick()
-  // Spy follows
-  spyPlace.value = playerPlace.value
-  // Capture
-  if (playerPlace.value === spyPlace.value) {
+  if (status.value !== 'playing') return
+  if (target === spyPlace.value) {
     log.value.push(locale.current === 'pt-BR' ? '✕ O espião inimigo te viu! Capturado.' : '✕ Enemy spy saw you! Captured.')
     status.value = 'lost'
     sfx.lose()
     return
   }
+  spyPlace.value = previous
+  sfx.tick()
   log.value.push(locale.current === 'pt-BR' ? `▶ ${placeName(target)}` : `▶ ${placeName(target)}`)
   checkLandmarks()
 }
@@ -120,11 +122,6 @@ function checkLandmarks() {
     } else {
       log.value.push(locale.current === 'pt-BR' ? '▸ Escaninho trancado. Precisa da chave.' : '▸ Locker is locked. Need the key.')
     }
-  }
-  if (p === spyPlace.value && p !== 2) {
-    log.value.push(locale.current === 'pt-BR' ? '✕ Espião inimigo aqui! Capturado.' : '✕ Enemy spy here! Captured.')
-    status.value = 'lost'
-    sfx.lose()
   }
   if (p === contactPlace.value && !messageLeft.value) {
     log.value.push(locale.current === 'pt-BR' ? '▸ Local do contato. DIZER senha ou DEIXAR mensagem.' : '▸ Contact location. SAY password or LEAVE message.')
@@ -153,7 +150,16 @@ function say(pwd: string) {
   // password is the city — try checking
   if (pwd.toLowerCase() === 'escola' || pwd.toLowerCase() === 'school') {
     log.value.push(locale.current === 'pt-BR' ? '✓ Senha correta!' : '✓ Correct password!')
-    metContact.value = true
+    if (playerPlace.value === contactPlace.value && hasBriefcase.value) {
+      metContact.value = true
+    } else if (playerPlace.value === 0 && hasBriefcase.value && metContact.value && messageLeft.value) {
+      advanceTime(2)
+      if (status.value === 'playing') {
+        status.value = 'won'
+        sfx.win()
+      }
+      return
+    }
     sfx.powerup()
   } else {
     log.value.push(locale.current === 'pt-BR' ? `✗ Senha "${pwd}" errada` : `✗ Password "${pwd}" wrong`)
@@ -192,16 +198,12 @@ function advanceTime(min: number) {
     minute.value -= 60
     hour.value++
   }
-  if (hour.value >= lastFlightHour.value && playerPlace.value !== 0) {
+  if (hour.value >= lastFlightHour.value) {
     log.value.push(locale.current === 'pt-BR' ? '✕ Último voo partiu. Missão falhou.' : '✕ Last flight left. Mission failed.')
     status.value = 'lost'
     sfx.lose()
   }
-  if (hour.value >= lastFlightHour.value && playerPlace.value === 0 && metContact.value) {
-    status.value = 'won'
-    sfx.win()
-    log.value.push(locale.current === 'pt-BR' ? '★ Último voo pego. Missão completa!' : '★ Caught last flight. Mission complete!')
-  }
+
 }
 
 function parse(text: string) {
@@ -251,14 +253,6 @@ function submit() {
   input.value = ''
 }
 
-function onKey(e: KeyboardEvent) {
-  if (status.value !== 'playing') return
-  if (e.key === 'Enter') submit()
-}
-
-onMounted(() => window.addEventListener('keydown', onKey))
-onUnmounted(() => window.removeEventListener('keydown', onKey))
-
 function onQuit() { router.push('/') }
 </script>
 
@@ -286,6 +280,7 @@ function onQuit() { router.push('/') }
         <span :class="messageLeft ? 'amber-phosphor' : 'text-ink-dim'">✉ {{ messageLeft ? 'SIM' : '—' }}</span>
         <span class="text-magenta ml-auto">⏰ {{ pad(hour) }}:{{ pad(minute) }}</span>
       </div>
+      <p class="text-xs text-cyan">{{ locale.current === 'pt-BR' ? 'Destinos' : 'Destinations' }}: {{ ADJ[playerPlace].map(placeName).join(' · ') }}. {{ locale.current === 'pt-BR' ? 'Espião' : 'Spy' }}: {{ placeName(spyPlace) }}</p>
       <div class="flex-1 overflow-y-auto pr-2 space-y-0.5 phosphor">
         <p v-for="(m, i) in log.slice(-30)" :key="i" class="whitespace-pre-wrap" :class="i === log.slice(-30).length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
       </div>

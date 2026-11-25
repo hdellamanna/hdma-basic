@@ -53,9 +53,9 @@ function onQuit() {
     <!-- HUD bar -->
     <div
       v-if="showHud"
-      class="flex items-center justify-between border border-surface-600 bg-surface-800 px-3 py-1.5 text-[10px] font-display tracking-widest"
+      class="flex flex-wrap gap-2 items-center justify-between border border-surface-600 bg-surface-800 px-3 py-1.5 text-[10px] font-display tracking-widest"
     >
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-3">
         <span v-if="title" :class="accent">{{ title }}</span>
         <span v-if="props.score !== undefined" class="text-ink-muted">
           {{ t('score', locale.current) }}: <span class="text-amber">{{ props.score }}</span>

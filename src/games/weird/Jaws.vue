@@ -36,16 +36,12 @@ function start() {
   score.value = 0
   moves.value = 0
   people.value = []
+  const water = GRID.flatMap((row, y) => Array.from(row, (tile, x) => ({ tile, x, y })))
+    .filter(({ tile, x, y }) => tile === '.'
+      && (x !== player.value.x || y !== player.value.y)
+      && (x !== hunter.value.x || y !== hunter.value.y))
   for (let i = 0; i < 5; i++) {
-    let x, y
-    do {
-      x = 1 + Math.floor(Math.random() * (W - 2))
-      y = 1 + Math.floor(Math.random() * (H - 2))
-    } while (
-      (x === 1 && y === 1) ||
-      (x === 8 && y === 8) ||
-      people.value.some((p) => p.x === x && p.y === y)
-    )
+    const [{ x, y }] = water.splice(Math.floor(Math.random() * water.length), 1)
     people.value.push({ x, y, eaten: false })
   }
   shuffleKeys()

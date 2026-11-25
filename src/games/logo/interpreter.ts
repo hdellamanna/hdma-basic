@@ -12,7 +12,7 @@
  *   Vars:     MAKE "name value, :name (read)
  *   Output:   PRINT expr, LABEL "text
  *   Misc:     WAIT n
- * Coordinates: 0,0 = canvas center, x right, y down (canvas convention).
+ * Coordinates: 0,0 = canvas center, x right, y up.
  * Heading: 0 = up, 90 = right, 180 = down, 270 = left (degrees).
  */
 
@@ -31,7 +31,7 @@ export type Node =
   | { kind: 'var'; name: string }   // :name
   | { kind: 'quoted'; name: string } // "name (treated as variable NAME for MAKE)
   | { kind: 'list'; items: Node[] }
-  | { kind: 'call'; name: string; args: Node[] }
+  | { kind: 'binary'; op: string; left: Node; right: Node }
 
 export interface TurtleState {
   x: number
@@ -66,6 +66,9 @@ export interface ExecResult {
   procedures: Procedure[]
 }
 
+const STOP = Symbol('stop procedure')
+const precedence: Record<string, number> = { '<': 1, '>': 1, '=': 1, '+': 2, '-': 2, '*': 3, '/': 3 }
+
 const COLORS = [
   '#7CFC00', // phosphor green
   '#FFFFFF', // white
@@ -82,7 +85,6 @@ export class LogoInterpreter {
   errors: string[] = []
   warnings: string[] = []
   private opts: ExecOptions
-  private stepping = false
 
   constructor(opts: ExecOptions = {}) {
     this.opts = opts
@@ -122,7 +124,14 @@ export class LogoInterpreter {
     while (i < input.length) {
       const c = input[i]
       if (/\s/.test(c)) { i++; continue }
-      if (c === '[' || c === ']' || c === '(' || c === ')' || c === '+' || c === '-' || c === '*' || c === '/') {
+      const signed = c === '-' && (i === 0 || /[\s[(]/.test(input[i - 1]))
+        ? input.slice(i).match(/^-\d+(?:\.\d+)?/) : null
+      if (signed) {
+        out.push(signed[0])
+        i += signed[0].length
+        continue
+      }
+      if (Object.hasOwn(precedence, c) || '[]()'.includes(c)) {
         out.push(c); i++; continue
       }
       if (c === '"') {
@@ -142,7 +151,7 @@ export class LogoInterpreter {
       }
       // word/number
       let j = i
-      while (j < input.length && /[A-Za-z0-9_.\-]/.test(input[j])) j++
+      while (j < input.length && /[A-Za-z0-9_.]/.test(input[j])) j++
       if (j > i) {
         out.push(input.slice(i, j))
         i = j
@@ -162,63 +171,49 @@ export class LogoInterpreter {
 
   private parseListMultiLine(tokens: string[]): Node[] {
     let pos = 0
-    const parseList = (stopOnRightBracket: boolean): Node[] => {
-      const items: Node[] = []
-      while (pos < tokens.length) {
-        const t = tokens[pos]
-        if (t === undefined) break
-        if (t === ']') {
-          if (stopOnRightBracket) break
-          pos++  // skip stray ']'
-          continue
-        }
-        if (t === '[') {
-          pos++
-          items.push({ kind: 'list', items: parseList(true) })
-          continue
-        }
-        items.push(parseAtom())
+    const atom = (): Node => {
+      const t = tokens[pos++]
+      if (!t) throw new Error('Missing argument')
+      if (t === '[') return { kind: 'list', items: readList(']') }
+      if (t === '(') {
+        const node = expression()
+        if (tokens[pos++] !== ')') throw new Error('Expected )')
+        return node
       }
-      return items
-    }
-    const parseAtom = (): Node => {
-      const t = tokens[pos]
-      if (t === undefined) return { kind: 'word', value: '' }
-      if (t.startsWith(':')) { pos++; return { kind: 'var', name: t.slice(1).toUpperCase() } }
-      if (t.startsWith('"')) { pos++; return { kind: 'quoted', name: t.slice(1).toUpperCase() } }
-      if (/^-?\d+(\.\d+)?$/.test(t)) { pos++; return { kind: 'num', value: parseFloat(t) } }
-      pos++
+      if (t === ']' || t === ')') throw new Error(`Unexpected ${t}`)
+      if (t.startsWith(':')) return { kind: 'var', name: t.slice(1).toUpperCase() }
+      if (t.startsWith('"')) return { kind: 'quoted', name: t.slice(1).toUpperCase() }
+      if (/^-?\d+(\.\d+)?$/.test(t)) return { kind: 'num', value: Number(t) }
       return { kind: 'word', value: t.toUpperCase() }
     }
-    // Parse at top level (no right-bracket stop)
-    const topItems: Node[] = []
-    while (pos < tokens.length) {
-      if (tokens[pos] === 'TO') {
-        pos++
-        const name = (tokens[pos++] ?? '').toUpperCase()
-        const params: string[] = []
-        while (pos < tokens.length && tokens[pos].startsWith(':')) {
-          params.push(tokens[pos++].slice(1).toUpperCase())
-        }
-        const body: Node[] = []
-        while (pos < tokens.length && tokens[pos] !== 'END') {
-          if (tokens[pos] === '[') {
-            pos++
-            body.push({ kind: 'list', items: parseList(true) })
-            continue
-          }
-          if (tokens[pos] === ']') { pos++; continue }
-          body.push(parseAtom())
-        }
-        if (tokens[pos] === 'END') pos++
-        this.procedures.set(name, { name, params, body })
-        continue
+    const expression = (minimum = 1): Node => {
+      let left = atom()
+      while (Object.hasOwn(precedence, tokens[pos]) && precedence[tokens[pos]] >= minimum) {
+        const op = tokens[pos++]
+        left = { kind: 'binary', left, op, right: expression(precedence[op] + 1) }
       }
-      // Use parseList which handles [ ] correctly
-      const remaining = parseList(false)
-      topItems.push(...remaining)
+      return left
     }
-    return topItems
+    const readList = (end?: string): Node[] => {
+      const result: Node[] = []
+      while (pos < tokens.length) {
+        const next = tokens[pos].toUpperCase()
+        if (next === end) { pos++; return result }
+        if (!end && next === 'TO') {
+          pos++
+          const name = tokens[pos++]?.toUpperCase()
+          if (!name) throw new Error('Missing procedure name')
+          const params: string[] = []
+          while (tokens[pos]?.startsWith(':')) params.push(tokens[pos++].slice(1).toUpperCase())
+          this.procedures.set(name, { name, params, body: readList('END') })
+        } else {
+          result.push(expression())
+        }
+      }
+      if (end) throw new Error(`Expected ${end}`)
+      return result
+    }
+    return readList()
   }
 
   // ---- Evaluator ----
@@ -232,7 +227,7 @@ export class LogoInterpreter {
       this.errors.push(`Parse error: ${e.message}`)
       return { errors: this.errors, warnings: this.warnings, procedures: [...this.procedures.values()] }
     }
-    await this.execList(ast, new Map())
+    try { await this.execList(ast, new Map()) } catch (error) { if (error !== STOP) throw error }
     this.opts.onTurtle?.(this.state)
     return { errors: this.errors, warnings: this.warnings, procedures: [...this.procedures.values()] }
   }
@@ -268,17 +263,8 @@ export class LogoInterpreter {
       return 1
     }
     if (cmd === 'HOME') {
-      this.state.x = this.opts.init?.x ?? 0
-      this.state.y = this.opts.init?.y ?? 0
       this.state.heading = 0
-      if (this.state.penDown) {
-        this.opts.onDraw?.(
-          { x: this.state.x, y: this.state.y },
-          { x: this.opts.init?.x ?? 0, y: this.opts.init?.y ?? 0 },
-          this.state.color, this.state.width
-        )
-      }
-      this.opts.onTurtle?.(this.state)
+      await this.goto(this.opts.init?.x ?? 0, this.opts.init?.y ?? 0)
       return 1
     }
     if (cmd === 'END') return 1
@@ -395,7 +381,7 @@ export class LogoInterpreter {
       locals.set(vname, val)
       return 3
     }
-    if (cmd === 'STOP') return 9999
+    if (cmd === 'STOP') throw STOP
     if (cmd === 'TO') {
       // Already handled in parse; skip in exec
       let depth = 1
@@ -415,7 +401,7 @@ export class LogoInterpreter {
         const v = await this.evalAny(nodes[i + 1 + p], locals)
         newLocals.set(proc.params[p], v)
       }
-      await this.execList(proc.body, newLocals)
+      try { await this.execList(proc.body, newLocals) } catch (error) { if (error !== STOP) throw error }
       return 1 + proc.params.length
     }
     // Number literal = noop
@@ -427,7 +413,7 @@ export class LogoInterpreter {
   private async move(distance: number) {
     const rad = (this.state.heading - 90) * Math.PI / 180
     const dx = Math.cos(rad) * distance
-    const dy = Math.sin(rad) * distance
+    const dy = -Math.sin(rad) * distance
     const nx = this.state.x + dx
     const ny = this.state.y + dy
     if (this.state.penDown) {
@@ -459,6 +445,10 @@ export class LogoInterpreter {
   private async evalNum(node: Node | undefined, locals: Map<string, LogoValue>): Promise<number | null> {
     if (!node) return null
     if (node.kind === 'num') return node.value
+    if (node.kind === 'binary') {
+      const value = await this.evalAny(node, locals)
+      return Number.isFinite(Number(value)) ? Number(value) : null
+    }
     if (node.kind === 'word' && /^-?\d+(\.\d+)?$/.test(node.value)) return parseFloat(node.value)
     if (node.kind === 'var') {
       const v = this.lookupVar(node.name, locals)
@@ -474,6 +464,19 @@ export class LogoInterpreter {
   private async evalAny(node: Node | undefined, locals: Map<string, LogoValue>): Promise<LogoValue> {
     if (!node) return ''
     if (node.kind === 'num') return node.value
+    if (node.kind === 'binary') {
+      const a = Number(await this.evalAny(node.left, locals))
+      const b = Number(await this.evalAny(node.right, locals))
+      switch (node.op) {
+        case '+': return a + b
+        case '-': return a - b
+        case '*': return a * b
+        case '/': return a / b
+        case '<': return a < b
+        case '>': return a > b
+        case '=': return a === b
+      }
+    }
     if (node.kind === 'str') return node.value
     if (node.kind === 'quoted') return node.name
     if (node.kind === 'var') return this.lookupVar(node.name, locals)

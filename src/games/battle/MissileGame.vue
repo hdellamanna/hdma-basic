@@ -20,6 +20,7 @@ let lastSpawn = 0
 
 function start() {
   if (frame !== null) cancelAnimationFrame(frame)
+  lastSpawn = performance.now()
   cannonX.value = W / 2
   missiles.value = []
   interceptions.value = []
@@ -38,24 +39,26 @@ function loop() {
   missiles.value.forEach((m) => (m.y += 1.5))
   interceptions.value.forEach((i) => { i.x += i.vx; i.y += i.vy })
   // Collisions
+  const intercepted = new Set<(typeof missiles.value)[number]>()
   for (const i of interceptions.value) {
     for (const m of missiles.value) {
-      if (Math.abs(i.x - m.x) < 12 && Math.abs(i.y - m.y) < 12) {
-        m.y = H + 10
+      if (!intercepted.has(m) && Math.abs(i.x - m.x) < 12 && Math.abs(i.y - m.y) < 12) {
+        intercepted.add(m)
         i.y = -10
         score.value++
         sfx.explode()
         if (score.value >= 10) { status.value = 'won'; sfx.win(); return }
+        break
       }
     }
   }
+  missiles.value = missiles.value.filter((m) => !intercepted.has(m))
   // Reach ground
   if (missiles.value.some((m) => m.y > H - 20)) {
     status.value = 'lost'
     sfx.lose()
     return
   }
-  missiles.value = missiles.value.filter((m) => m.y < H + 20)
   interceptions.value = interceptions.value.filter((i) => i.y > 0 && i.y < H)
   frame = requestAnimationFrame(loop)
 }
@@ -104,7 +107,7 @@ function onQuit() { router.push('/') }
         <div
           v-for="(m, i) in missiles"
           :key="`m-${i}`"
-          class="absolute w-0.5 h-3 danger-phosphor shadow-neon-red"
+          class="absolute w-0.5 h-3 bg-danger shadow-neon-red"
           :style="{ left: `${m.x}px`, top: `${m.y}px` }"
         ></div>
         <div

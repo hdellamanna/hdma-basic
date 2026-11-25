@@ -16,7 +16,7 @@ const targetAngle = ref(0)
 const log = ref<string[]>([])
 const dir = ref('')
 const elev = ref('')
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 
 function start() {
   missiles.value = 5
@@ -30,7 +30,7 @@ function start() {
 }
 
 function fire() {
-  if (missiles.value <= 0) return
+  if (status.value !== 'playing' || missiles.value <= 0) return
   const d = parseFloat(dir.value)
   const e = parseFloat(elev.value)
   if (isNaN(d) || isNaN(e)) return
@@ -77,9 +77,9 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="missiles === 5 && hits === 0" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
-        {{ locale.current === 'pt-BR' ? '5 mísseis. Acerte a fortaleza 3 vezes. Direção (-90/+90), Elevação (0/90).' : '5 missiles. Hit the fortress 3 times. Direction (-90/+90), Elevation (0/90).' }}
+        {{ locale.current === 'pt-BR' ? '5 mísseis. Acerte a fortaleza 3 vezes. Direção (-90/+90), Elevação (0/90). Cada grau de elevação alcança 3 m.' : '5 missiles. Hit the fortress 3 times. Direction (-90/+90), Elevation (0/90). Each degree of elevation reaches 3 m.' }}
       </p>
       <button class="arcade-btn arcade-btn-amber" @click="start">▶ START</button>
     </div>
@@ -88,6 +88,7 @@ function onQuit() { router.push('/') }
         <span class="text-cyan">MISSILES <span class="text-amber">{{ missiles }}</span></span>
         <span class="text-amber">HITS <span class="text-amber">{{ hits }}</span>/3</span>
       </p>
+      <p v-if="status === 'playing'" class="text-xs text-cyan">{{ locale.current === 'pt-BR' ? 'Alvo' : 'Target' }}: {{ targetAngle }}° · {{ targetDist }} m</p>
       <div class="border border-surface-600 bg-surface-800 p-2 h-24 overflow-y-auto text-xs space-y-0.5">
         <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
       </div>

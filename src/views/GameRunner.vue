@@ -90,8 +90,8 @@ async function startGame() {
       <h1 class="font-display text-lg sm:text-2xl text-shadow-neon" :class="accentText">
         {{ game.i18n[locale.current].title }}
       </h1>
-      <RouterLink v-if="game.id === 'moonlander'" :to="{ name: 'remastered' }" class="pavilion-link">
-        {{ locale.isPt ? 'Remastered · Correio Lunar' : 'Remastered · Lunar Courier' }}
+      <RouterLink :to="{ name: 'edition', params: { id: game.id } }" class="pavilion-link">
+        {{ locale.isPt ? 'Jogar edição remasterizada' : 'Play remastered edition' }}
       </RouterLink>
       <span class="text-[10px] font-display tracking-widest text-ink-muted">
         {{ game.year }} · {{ manual?.i18n[locale.current].title }}

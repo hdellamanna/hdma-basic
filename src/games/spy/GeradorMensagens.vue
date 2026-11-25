@@ -46,11 +46,9 @@ function reverse(s: string) {
 }
 
 function swapPairs(s: string) {
-  // pad to even length by prepending X
-  if (s.length % 2 !== 0) s = 'F' + s
   let out = ''
   for (let i = 0; i < s.length; i += 2) {
-    out += s[i + 1] + s[i]
+    out += (s[i + 1] ?? '') + s[i]
   }
   return out
 }

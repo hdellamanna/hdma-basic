@@ -25,37 +25,33 @@ function start() {
   status.value = 'playing'
 }
 
+function advance(enemySteps: number) {
+  turn.value++
+  enemyDist.value = Math.max(0, enemyDist.value - enemySteps)
+  if (wall.value >= 20) {
+    status.value = 'won'
+    sfx.win()
+  } else if (turn.value >= 12 || enemyDist.value === 0) {
+    status.value = 'lost'
+    sfx.lose()
+  }
+}
+
 function build() {
   if (soldiers.value < 1) { sfx.error(); return }
   wall.value += 5
   soldiers.value--
-  turn.value++
   sfx.shoot()
-  enemyDist.value -= 8
+  advance(8)
   log.value.push(`▶ Build → wall ${wall.value}, soldiers ${soldiers.value}, enemy ${enemyDist.value}`)
-  if (enemyDist.value <= 0) {
-    status.value = wall.value >= 20 ? 'won' : 'lost'
-    if (status.value === 'won') sfx.win(); else sfx.lose()
-  } else if (turn.value >= 12) {
-    status.value = wall.value >= 20 ? 'won' : 'lost'
-    if (status.value === 'won') sfx.win(); else sfx.lose()
-  }
 }
 
 function fortify() {
   if (soldiers.value < 2) { sfx.error(); return }
   soldiers.value -= 2
   wall.value += 8
-  turn.value++
-  enemyDist.value -= 10
+  advance(10)
   log.value.push(`▶ Fortify → wall ${wall.value}, soldiers ${soldiers.value}, enemy ${enemyDist.value}`)
-  if (enemyDist.value <= 0) {
-    status.value = wall.value >= 20 ? 'won' : 'lost'
-    if (status.value === 'won') sfx.win(); else sfx.lose()
-  } else if (turn.value >= 12) {
-    status.value = wall.value >= 20 ? 'won' : 'lost'
-    if (status.value === 'won') sfx.win(); else sfx.lose()
-  }
 }
 
 function onQuit() { router.push('/') }
@@ -79,11 +75,13 @@ function onQuit() { router.push('/') }
         <span class="text-cyan">WALL <span :class="wall >= 20 ? 'amber-phosphor' : 'text-amber'">{{ wall }}</span>/20</span>
         <span class="text-cyan">SOLDIERS {{ soldiers }}</span>
         <span :class="enemyDist < 30 ? 'danger-phosphor' : 'text-amber'">ENEMY {{ enemyDist }}</span>
+        <span>TURN {{ turn }}/12</span>
       </p>
       <div class="border border-surface-600 bg-surface-800 p-2 h-20 overflow-y-auto text-xs space-y-0.5">
         <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
       </div>
       <div v-if="status === 'playing'" class="grid grid-cols-2 gap-2">
+        <button class="arcade-btn" @click="advance(8)">{{ locale.current === 'pt-BR' ? 'Aguardar' : 'Wait' }}</button>
         <button class="arcade-btn" @click="build">🧱 Build (-1)</button>
         <button class="arcade-btn arcade-btn-amber" @click="fortify">⛓ Fortify (-2)</button>
       </div>

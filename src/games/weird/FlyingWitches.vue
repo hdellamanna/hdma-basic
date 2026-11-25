@@ -24,7 +24,7 @@ const ingredients = ref<{ x: number; y: number; letter: string; isSnatcher: bool
 const collected = ref<string[]>([])
 const brooms = ref(3)
 const log = ref<string[]>([])
-const status = ref<'playing' | 'won' | 'lost'>('playing')
+const status = ref<'intro' | 'playing' | 'won' | 'lost'>('intro')
 
 let lastSpawn = 0
 let frame: number | null = null
@@ -116,7 +116,7 @@ function onQuit() { router.push('/') }
     @restart="start"
     @quit="onQuit"
   >
-    <div v-if="ingredients.length === 0 && collected.length === 0 && status === 'playing'" class="text-center py-6">
+    <div v-if="status === 'intro'" class="text-center py-6">
       <p class="text-ink-muted text-sm mb-4">
         {{ locale.current === 'pt-BR' ? 'Colete 4 ingredientes para a Superwitch. Cuidado com o Snatcher!' : 'Collect 4 ingredients for Superwitch. Beware the Snatcher!' }}
       </p>

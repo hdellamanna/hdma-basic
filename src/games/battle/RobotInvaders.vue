@@ -23,6 +23,8 @@ let dir = 1
 let frame: number | null = null
 
 function start() {
+  lastShot = -Infinity
+  lastEnemy = 0
   if (frame !== null) cancelAnimationFrame(frame)
   shipX.value = W / 2
   bullets.value = []

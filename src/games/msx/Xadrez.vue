@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const edition = defineProps<{ remastered?: boolean }>()
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
@@ -21,6 +22,12 @@ const { schedule, cancel } = useRoundTimer()
 
 function initBoard() {
   const empty: (Piece | null)[][] = Array(8).fill(null).map(() => Array(8).fill(null))
+  if (edition.remastered) {
+    empty[0][4] = { type: 'k', color: 'b' }
+    empty[3][4] = { type: 'k', color: 'w' }
+    empty[4][0] = { type: 'r', color: 'w' }
+    return empty
+  }
   const back: Piece['type'][] = ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r']
   for (let c = 0; c < 8; c++) {
     empty[0][c] = { type: back[c], color: 'b' }
@@ -189,7 +196,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 
 function onQuit() { router.push('/') }
 
-const STORAGE_KEY = 'hdma-mlogo-era:xadrez:save'
+const STORAGE_KEY = edition.remastered ? 'hdma-remastered:xadrez:save' : 'hdma-mlogo-era:xadrez:save'
 function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify({ board: board.value, turn: turn.value }))
   sfx.coin()
@@ -241,7 +248,8 @@ function load() {
       </div>
       <div class="grid grid-cols-8 gap-0 bg-void-deep border border-surface-600 mx-auto" style="max-width: 360px;">
         <template v-for="(row, r) in board" :key="`r-${r}`">
-          <div
+          <button type="button"
+            :aria-label="String.fromCharCode(65 + c) + (8 - r) + (piece ? ' · ' + PIECE_GLYPH[piece.color + piece.type] : '')"
             v-for="(piece, c) in row"
             :key="`c-${r}-${c}`"
             class="aspect-square grid place-items-center cursor-pointer text-2xl"
@@ -253,7 +261,7 @@ function load() {
             @click="select(r, c)"
           >
             <span :class="piece?.color === 'w' ? 'text-amber' : 'text-ink'">{{ piece ? PIECE_GLYPH[piece.color + piece.type] : '' }}</span>
-          </div>
+          </button>
         </template>
       </div>
       <p v-if="status === 'won'" class="amber-phosphor text-shadow-neon font-display text-center">{{ locale.isPt ? '★ VOCÊ VENCEU ★' : '★ YOU WIN ★' }}</p>
