@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ManualPage from '../components/ManualPage.vue'
 import { computed, onMounted, onUnmounted, ref, shallowRef, type Component } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { useLocaleStore } from '../stores/locale'
@@ -139,16 +140,7 @@ async function startGame() {
         >
           ▶ {{ loading ? (locale.isPt ? 'Carregando…' : 'Loading…') : t('pressStart', locale.current) }}
         </button>
-        <a
-          v-if="manual?.pdfPath"
-          :href="manual.pdfPath"
-          target="_blank"
-          rel="noopener"
-          class="text-[10px] font-display tracking-widest text-ink-muted hover:text-ink underline-offset-4 hover:underline"
-          @click="sfx.select()"
-        >
-          ⤓ {{ t('fromTheManual', locale.current) }} (PDF)
-        </a>
+
       </div>
     </div>
 
@@ -160,5 +152,6 @@ async function startGame() {
     <p v-if="loadError" role="alert" class="mt-4 text-danger">
       {{ locale.isPt ? 'Falha ao carregar o jogo. Tente iniciar novamente.' : 'The game could not load. Try starting it again.' }}
     </p>
+    <ManualPage v-if="game" :game="game" />
   </section>
 </template>

@@ -4,9 +4,10 @@ Fliperama de navegador com 58 jogos recriados a partir de oito manuais publicado
 
 - **Clássicos.** Os jogos dos manuais foram adaptados de BASIC para TypeScript. Os endereços `/play/:manualId/:gameId` abrem a edição clássica. O código de cada jogo é carregado ao iniciar a partida.
 - **Remastered.** O salão em `/remasters` permite buscar um título ou manual e abrir a edição de cada jogo. Há expedições por turnos, interceptações em tempo real, desafios de lógica, finais de tabuleiro e uma oficina de rosáceas em Logo.
+- **Missões dos manuais.** Bolsa de Astron reimagina os dez anos da colônia de Space Mines. No Observatório do Tempo, o jogador programa voos relativísticos. O vitral de Gustavus traz Sim para um ou dois jogadores. Em cada máquina, um seletor dá acesso à outra missão do título.
 - **Jogo extra.** Correio Lunar (`/remastered`) é um quebra-cabeça original de navegação e recarga inspirado no tema lunar de Moonlander. Funciona com teclado, mouse e toque. A edição textual do mesmo jogo está disponível em BASIC com linhas numeradas em `public/basic/correio-lunar.bas`. Para executá-la, use `bwbasic public/basic/correio-lunar.bas`.
 - **Oficina de Logo.** Interpretador de Logo e desenho com a tartaruga em `/play/apple-logo/apple-logo`.
-- **Manuais.** Oito PDFs para consulta em `/downloads`.
+- **Manuais.** Oito PDFs para consulta em `/downloads`. Cada um dos 58 jogos traz uma miniatura, a premissa histórica e o link para a página específica do PDF. O número indicado é o do visualizador.
 
 ## Acervo clássico
 
