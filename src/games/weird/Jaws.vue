@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import '../tile-map.css'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
@@ -133,12 +134,12 @@ function onQuit() { router.push('/') }
         <span class="text-cyan">EATEN <span class="text-amber">{{ score }}</span>/5</span>
         <span class="text-ink-dim">{{ keys[0] }} {{ keys[1] }} {{ keys[2] }} {{ keys[3] }}</span>
       </p>
-      <div class="grid gap-0.5 bg-void-deep p-1 border border-surface-600" :style="{ gridTemplateColumns: `repeat(${W}, 1fr)` }">
+      <div class="game-tile-map bg-void-deep p-1 border border-surface-600" :style="{ '--columns': W }">
         <template v-for="(row, y) in GRID" :key="`r-${y}`">
           <div
             v-for="(cell, x) in row"
             :key="`c-${y}-${x}`"
-            class="aspect-square border border-surface-700 grid place-items-center text-xs"
+            class="game-map-cell border border-surface-700"
           >
             <span v-if="player.x === x && player.y === y" class="phosphor font-bold">J</span>
             <span v-else-if="hunter.x === x && hunter.y === y" class="danger-phosphor font-bold">H</span>

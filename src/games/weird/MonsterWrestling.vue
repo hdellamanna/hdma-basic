@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -137,12 +138,11 @@ function onQuit() { router.push('/') }
         <p class="text-cyan text-sm">OXYGEN: <span class="amber-phosphor text-shadow-neon font-display">{{ oxygen }}</span></p>
         <p class="text-ink-muted text-xs">ADRENALIN = heartbeat / oxygen</p>
       </div>
-      <div class="border border-surface-600 bg-surface-800 p-2 h-16 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" class="border border-surface-600 bg-surface-800 p-2 h-16 text-xs space-y-0.5" />
       <div v-if="status === 'playing'" class="flex gap-1">
         <input
           v-model="input"
+          :aria-label="showPanic ? (locale.isPt ? 'Dose de adrenalina' : 'Adrenaline dose') : (locale.isPt ? 'Produto do tamanho pela distância' : 'Product of size and distance')"
           type="number"
           step="0.01"
           class="flex-1 bg-void-deep border border-surface-600 px-2 py-1 text-amber text-center outline-none focus:border-phosphor-green"

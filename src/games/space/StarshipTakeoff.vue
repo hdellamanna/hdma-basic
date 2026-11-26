@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -87,13 +88,12 @@ const accent = computed(() => 'phosphor')
     <div v-else class="font-mono space-y-2 text-amber">
       <p class="text-cyan text-lg">{{ ui.gravity[locale.current] }} <span class="font-bold">{{ g }}</span></p>
       <p class="text-ink-muted text-xs">{{ ui.triesLeft[locale.current] }} <span :class="triesLeft <= 2 ? 'danger-phosphor' : 'text-amber'">{{ triesLeft }}</span></p>
-      <div class="border border-surface-600 bg-surface-800 p-3 h-40 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" class="border border-surface-600 bg-surface-800 p-3 h-40 text-xs space-y-0.5" />
       <form v-if="status === 'playing'" class="flex items-center gap-2" @submit.prevent="submit">
         <span class="text-cyan">▶</span>
         <input
           v-model="guess"
+          :aria-label="ui.enterForce[locale.current]"
           type="number"
           min="1"
           :placeholder="ui.enterForce[locale.current]"

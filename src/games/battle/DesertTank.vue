@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -89,17 +90,15 @@ function onQuit() { router.push('/') }
         <span class="text-amber">HITS <span class="text-amber">{{ hits }}</span>/3</span>
       </p>
       <p v-if="status === 'playing'" class="text-xs text-cyan">{{ locale.current === 'pt-BR' ? 'Alvo' : 'Target' }}: {{ targetAngle }}° · {{ targetDist }} m</p>
-      <div class="border border-surface-600 bg-surface-800 p-2 h-24 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" class="border border-surface-600 bg-surface-800 p-2 h-24 text-xs space-y-0.5" />
       <form v-if="status === 'playing'" class="space-y-1" @submit.prevent="fire">
         <div class="flex items-center gap-2">
           <span class="text-cyan text-xs w-20">DIR:</span>
-          <input v-model="dir" type="number" min="-90" max="90" class="flex-1 bg-void-deep border border-surface-600 px-2 py-1 text-amber outline-none focus:border-phosphor-green" />
+          <input v-model="dir" :aria-label="locale.isPt ? 'DIR · Direção de tiro em graus' : 'DIR · Firing direction in degrees'" type="number" min="-90" max="90" class="flex-1 bg-void-deep border border-surface-600 px-2 py-1 text-amber outline-none focus:border-phosphor-green" />
         </div>
         <div class="flex items-center gap-2">
           <span class="text-cyan text-xs w-20">ELEV:</span>
-          <input v-model="elev" type="number" min="0" max="90" class="flex-1 bg-void-deep border border-surface-600 px-2 py-1 text-amber outline-none focus:border-phosphor-green" />
+          <input v-model="elev" :aria-label="locale.isPt ? 'ELEV · Elevação em graus' : 'ELEV · Elevation in degrees'" type="number" min="0" max="90" class="flex-1 bg-void-deep border border-surface-600 px-2 py-1 text-amber outline-none focus:border-phosphor-green" />
         </div>
         <button class="arcade-btn arcade-btn-magenta w-full">🔥 FIRE</button>
       </form>

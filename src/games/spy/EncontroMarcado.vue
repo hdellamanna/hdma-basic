@@ -8,6 +8,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -281,13 +282,12 @@ function onQuit() { router.push('/') }
         <span class="text-magenta ml-auto">⏰ {{ pad(hour) }}:{{ pad(minute) }}</span>
       </div>
       <p class="text-xs text-cyan">{{ locale.current === 'pt-BR' ? 'Destinos' : 'Destinations' }}: {{ ADJ[playerPlace].map(placeName).join(' · ') }}. {{ locale.current === 'pt-BR' ? 'Espião' : 'Spy' }}: {{ placeName(spyPlace) }}</p>
-      <div class="flex-1 overflow-y-auto pr-2 space-y-0.5 phosphor">
-        <p v-for="(m, i) in log.slice(-30)" :key="i" class="whitespace-pre-wrap" :class="i === log.slice(-30).length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" :limit="30" preserve-whitespace class="flex-1 pr-2 space-y-0.5 phosphor" />
       <form v-if="status === 'playing'" class="mt-2 flex items-center gap-2 border-t border-surface-600 pt-2" @submit.prevent="submit">
         <span class="phosphor">&gt;</span>
         <input
           v-model="input"
+          :aria-label="locale.isPt ? 'Comando da aventura' : 'Adventure command'"
           class="flex-1 bg-transparent border-none outline-none text-amber font-mono placeholder-ink-dim"
           :placeholder="locale.current === 'pt-BR' ? 'IR ESTACAO · EXAMINAR · DIZER ESCOLA · HORA' : 'GO STATION · EXAMINE · SAY SCHOOL · TIME'"
           autofocus

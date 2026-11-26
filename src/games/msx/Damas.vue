@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
 import { useAudio } from '../../composables/useAudio'
 import { useRoundTimer } from '../../composables/useRoundTimer'
+import { useBoardFocus } from './useBoardFocus'
 import CrtFrame from '../../components/CrtFrame.vue'
 
 const router = useRouter()
@@ -42,7 +43,21 @@ function initBoard() {
   }
 }
 
+const { focusIndex, navigate } = useBoardFocus()
+function describe(piece: Piece) {
+  const colour = piece.color.toLowerCase() === 'r' ? (locale.isPt ? 'vermelha' : 'red') : (locale.isPt ? 'preta' : 'black')
+  const king = piece.color === piece.color.toUpperCase()
+  return colour + ' · ' + (king ? (locale.isPt ? 'dama' : 'king') : (locale.isPt ? 'peça' : 'man'))
+}
+function squareLabel(r: number, c: number, piece: Piece | null) {
+  const destination = validMoves.value.some(move => move.r === r && move.c === c)
+  const occupancy = piece ? describe(piece) : (locale.isPt ? 'vazia' : 'empty')
+  return String.fromCharCode(65 + c) + (8 - r) + ' · ' + occupancy
+    + (destination ? (locale.isPt ? ' · destino possível' : ' · available move') : '')
+}
+
 function start() {
+  focusIndex.value = 40
   cancel()
   initBoard()
   continuingJump.value = false
@@ -184,13 +199,16 @@ function onQuit() { router.push('/') }
     </div>
     <div v-else class="space-y-2">
       <p class="text-xs text-amber">TURN: <span :class="turn === 'r' ? 'text-danger' : 'text-ink'">{{ turn === 'r' ? (locale.current === 'pt-BR' ? 'VERMELHO' : 'RED') : (locale.current === 'pt-BR' ? 'PRETO' : 'BLACK') }}</span></p>
-      <div class="grid grid-cols-8 gap-0 bg-void-deep border border-surface-600 mx-auto" style="max-width: 360px;">
+      <div class="grid grid-cols-8 gap-0 bg-void-deep border border-surface-600 mx-auto" style="width: 100%; max-width: 30rem;" @keydown="navigate" role="group" :aria-label="locale.isPt ? 'Tabuleiro, use as setas para navegar' : 'Board, use arrow keys to navigate'">
         <template v-for="(row, r) in board" :key="`r-${r}`">
           <button type="button"
-            :aria-label="String.fromCharCode(65 + c) + (8 - r) + (piece ? ' · ' + (piece.color.toLowerCase() === 'r' ? (locale.isPt ? 'vermelha' : 'red') : (locale.isPt ? 'preta' : 'black')) : '')"
+            :aria-label="squareLabel(r, c, piece)"
+            :aria-pressed="selected?.r === r && selected?.c === c"
+            :tabindex="focusIndex === r * 8 + c ? 0 : -1"
+            @focus="focusIndex = r * 8 + c"
             v-for="(piece, c) in row"
             :key="`c-${r}-${c}`"
-            class="aspect-square grid place-items-center cursor-pointer"
+            class="aspect-square min-w-0 p-0 grid place-items-center cursor-pointer focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber"
             :class="[
               (r + c) % 2 === 0 ? 'bg-surface-700' : 'bg-void-deep',
               selected?.r === r && selected?.c === c ? 'ring-2 ring-amber' : '',

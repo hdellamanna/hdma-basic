@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -74,15 +75,14 @@ function onQuit() { router.push('/') }
     </div>
     <div v-else class="font-mono space-y-2">
       <p class="text-xs text-ink-muted">TRIES: <span :class="tries >= 5 ? 'danger-phosphor' : 'text-amber'">{{ tries }}/6</span></p>
-      <div class="border border-surface-600 bg-surface-800 p-2 h-32 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" class="border border-surface-600 bg-surface-800 p-2 h-32 text-xs space-y-0.5" />
       <div v-if="status === 'playing'" class="space-y-2">
         <div class="flex justify-center gap-2">
           <input
             v-for="(_, i) in guess"
             :key="i"
             v-model.number="guess[i]"
+            :aria-label="locale.isPt ? `Dígito ${i + 1}` : `Digit ${i + 1}`"
             type="number"
             min="0"
             max="9"

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import '../tile-map.css'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
@@ -92,7 +93,7 @@ function onQuit() { router.push('/') }
         <span class="text-cyan">RESCUED <span class="text-amber">{{ rescued }}</span>/5</span>
         <span :class="turns > 22 ? 'danger-phosphor' : 'text-ink-muted'">TURN {{ turns }}/{{ maxTurns }}</span>
       </p>
-      <div class="grid gap-0.5 bg-void-deep p-1 border border-surface-600" :style="{ gridTemplateColumns: `repeat(${W}, 1fr)`, aspectRatio: '1.2' }">
+      <div class="game-tile-map bg-void-deep p-1 border border-surface-600" :style="{ '--columns': W }">
         <div
           v-for="y in H"
           :key="`r-${y}`"
@@ -101,7 +102,7 @@ function onQuit() { router.push('/') }
           <div
             v-for="x in W"
             :key="`c-${y}-${x}`"
-            class="aspect-square border border-surface-700 grid place-items-center text-xs"
+            class="game-map-cell border border-surface-700"
             :class="player.x === x - 1 && player.y === y - 1 ? 'border-phosphor-green' : ''"
           >
             <span

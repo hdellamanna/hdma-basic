@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -88,12 +89,11 @@ function onQuit() { router.push('/') }
           :style="{ left: `${iceX}%`, top: `${iceY}%`, transform: 'translate(-50%, -50%)' }"
         >▲</div>
       </div>
-      <div class="border border-surface-600 bg-surface-800 p-2 h-20 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" class="border border-surface-600 bg-surface-800 p-2 h-20 text-xs space-y-0.5" />
       <form v-if="status === 'playing'" class="flex gap-1" @submit.prevent="submit">
         <input
           v-model="heading"
+          :aria-label="locale.isPt ? 'Correção de rumo' : 'Course correction'"
           type="number"
           min="-10"
           max="10"

@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
 import { useAudio } from '../../composables/useAudio'
 import { useRoundTimer } from '../../composables/useRoundTimer'
+import { useBoardFocus } from './useBoardFocus'
 import CrtFrame from '../../components/CrtFrame.vue'
 
 const router = useRouter()
@@ -38,7 +39,24 @@ function initBoard() {
   return empty
 }
 
+const { focusIndex, navigate } = useBoardFocus()
+const names = {
+  p: ['peão', 'pawn'], n: ['cavalo', 'knight'], b: ['bispo', 'bishop'],
+  r: ['torre', 'rook'], q: ['rainha', 'queen'], k: ['rei', 'king'],
+}
+function describe(piece: Piece) {
+  const colour = piece.color === 'w' ? (locale.isPt ? 'brancas' : 'white') : (locale.isPt ? 'pretas' : 'black')
+  return colour + ' · ' + names[piece.type][locale.isPt ? 0 : 1]
+}
+function squareLabel(r: number, c: number, piece: Piece | null) {
+  const destination = validMoves.value.some(move => move.r === r && move.c === c)
+  const occupancy = piece ? describe(piece) : (locale.isPt ? 'vazia' : 'empty')
+  return String.fromCharCode(65 + c) + (8 - r) + ' · ' + occupancy
+    + (destination ? (locale.isPt ? ' · destino possível' : ' · available move') : '')
+}
+
 function start() {
+  focusIndex.value = 52
   cancel()
   board.value = initBoard()
   turn.value = 'w'
@@ -238,7 +256,7 @@ function load() {
       <button class="arcade-btn arcade-btn-amber" @click="start">▶ START</button>
     </div>
     <div v-else class="space-y-2">
-      <div class="flex items-center justify-between text-xs">
+      <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
         <span :class="turn === 'w' ? 'amber-phosphor' : 'text-ink-muted'">{{ locale.current === 'pt-BR' ? 'BRANCAS' : 'WHITE' }}</span>
         <div class="flex gap-1">
           <button class="arcade-btn-ghost border border-surface-600 text-[10px] px-2 py-0.5" @click="save">SAVE</button>
@@ -246,13 +264,16 @@ function load() {
         </div>
         <span :class="turn === 'b' ? 'text-ink' : 'text-ink-muted'">{{ locale.current === 'pt-BR' ? 'PRETAS' : 'BLACK' }}</span>
       </div>
-      <div class="grid grid-cols-8 gap-0 bg-void-deep border border-surface-600 mx-auto" style="max-width: 360px;">
+      <div class="grid grid-cols-8 gap-0 bg-void-deep border border-surface-600 mx-auto" style="width: 100%; max-width: 30rem;" @keydown="navigate" role="group" :aria-label="locale.isPt ? 'Tabuleiro, use as setas para navegar' : 'Board, use arrow keys to navigate'">
         <template v-for="(row, r) in board" :key="`r-${r}`">
           <button type="button"
-            :aria-label="String.fromCharCode(65 + c) + (8 - r) + (piece ? ' · ' + PIECE_GLYPH[piece.color + piece.type] : '')"
+            :aria-label="squareLabel(r, c, piece)"
+            :aria-pressed="selected?.r === r && selected?.c === c"
+            :tabindex="focusIndex === r * 8 + c ? 0 : -1"
+            @focus="focusIndex = r * 8 + c"
             v-for="(piece, c) in row"
             :key="`c-${r}-${c}`"
-            class="aspect-square grid place-items-center cursor-pointer text-2xl"
+            class="aspect-square min-w-0 p-0 grid place-items-center cursor-pointer focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber text-2xl"
             :class="[
               (r + c) % 2 === 0 ? 'bg-surface-700' : 'bg-void-deep',
               selected?.r === r && selected?.c === c ? 'ring-2 ring-amber' : '',

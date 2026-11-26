@@ -92,6 +92,8 @@ function moveShip(dx: number) {
 
 function onKey(e: KeyboardEvent) {
   if (status.value !== 'playing') return
+  if (e.ctrlKey || e.altKey || e.metaKey || (e.key === ' ' && e.target instanceof HTMLButtonElement)) return
+  if (['ArrowLeft', 'ArrowRight'].includes(e.key)) e.preventDefault()
   if (e.key === 'ArrowLeft' || e.key === 'a') moveShip(-15)
   if (e.key === 'ArrowRight' || e.key === 'd') moveShip(15)
   if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') { e.preventDefault(); shoot() }
@@ -138,31 +140,30 @@ function onQuit() { router.push('/') }
     <div v-else class="space-y-2">
       <div class="text-xs text-ink-muted flex items-center justify-between">
         <span>WAVE <span class="text-amber">{{ wave }}/3</span></span>
-        <button class="arcade-btn-ghost border border-surface-600 px-2 py-0.5 text-[9px]" @click="shoot">▮ FIRE</button>
       </div>
       <div class="relative bg-void-deep border border-surface-600 overflow-hidden" :style="{ aspectRatio: `${W} / ${H}` }">
         <div
-          v-for="m in monsters"
-          :key="`m-${m.x}-${m.y}`"
+          v-for="(m, index) in monsters"
+          :key="index"
           v-show="m.alive"
           class="absolute w-3 h-3 danger-phosphor text-shadow-neon"
-          :style="{ left: `${m.x}px`, top: `${m.y}px`, transform: 'translate(-50%, -50%)' }"
+          :style="{ left: `${m.x / W * 100}%`, top: `${m.y / H * 100}%`, transform: 'translate(-50%, -50%)' }"
         >▣</div>
         <div
           v-for="(b, i) in bullets"
           :key="`b-${i}`"
           class="absolute w-0.5 h-3 bg-amber shadow-neon-amber"
-          :style="{ left: `${b.x}px`, top: `${b.y}px` }"
+          :style="{ left: `${b.x / W * 100}%`, top: `${b.y / H * 100}%` }"
         ></div>
         <div
           class="absolute phosphor text-shadow-neon"
-          :style="{ left: `${shipX}px`, bottom: '20px', transform: 'translateX(-50%)' }"
+          :style="{ left: `${shipX / W * 100}%`, top: `${(H - 30) / H * 100}%`, transform: 'translate(-50%, -50%)' }"
         >▲</div>
       </div>
-      <div class="grid grid-cols-3 gap-1 sm:hidden">
-        <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-2" @click="moveShip(-15)">◀</button>
-        <button class="arcade-btn-amber text-[10px] py-2" @click="shoot">FIRE</button>
-        <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-2" @click="moveShip(15)">▶</button>
+      <div v-if="status === 'playing'" class="grid grid-cols-3 gap-2">
+        <button class="min-h-11 touch-manipulation arcade-btn-ghost border border-surface-600 text-[10px] py-2" :aria-label="locale.current === 'pt-BR' ? 'Mover para a esquerda' : 'Move left'" @click="moveShip(-15)">◀</button>
+        <button class="min-h-11 touch-manipulation arcade-btn-amber text-[10px] py-2" @click="shoot">FIRE</button>
+        <button class="min-h-11 touch-manipulation arcade-btn-ghost border border-surface-600 text-[10px] py-2" :aria-label="locale.current === 'pt-BR' ? 'Mover para a direita' : 'Move right'" @click="moveShip(15)">▶</button>
       </div>
       <p v-if="status === 'won'" class="amber-phosphor text-shadow-neon font-display text-center">★ GALAXY SAVED ★</p>
       <p v-else-if="status === 'lost'" class="danger-phosphor text-shadow-neon font-display text-center">✕ DESTROYED ✕</p>

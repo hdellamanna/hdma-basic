@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -144,12 +145,11 @@ function onQuit() { router.push('/') }
           <span>{{ s || '·' }}</span>
         </div>
       </div>
-      <div class="border border-surface-600 bg-surface-800 p-2 h-32 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log.slice(-8)" :key="i" :class="i === log.slice(-8).length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" :limit="8" class="border border-surface-600 bg-surface-800 p-2 h-32 text-xs space-y-0.5" />
       <form v-if="status === 'playing'" class="flex gap-1" @submit.prevent="submit">
         <input
           v-model="input"
+          :aria-label="locale.isPt ? 'Posição de 1 a 10 ou D para descartar' : 'Position from 1 to 10 or D to discard'"
           maxlength="2"
           :placeholder="locale.current === 'pt-BR' ? '1-10 ou D' : '1-10 or D'"
           class="flex-1 bg-void-deep border border-surface-600 px-2 py-1 text-amber text-center text-2xl outline-none focus:border-phosphor-green uppercase"

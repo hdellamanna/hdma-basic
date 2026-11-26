@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import '../tile-map.css'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
@@ -101,12 +102,12 @@ function onQuit() { router.push('/') }
         <span :class="hasKey ? 'amber-phosphor' : 'text-ink-muted'">🔑 {{ hasKey ? 'KEY ✓' : '—' }}</span>
         <span :class="turns > 22 ? 'danger-phosphor' : 'text-cyan'">TURN {{ turns }}/{{ maxTurns }}</span>
       </p>
-      <div class="grid gap-0.5 bg-void-deep p-1 border border-surface-600" :style="{ gridTemplateColumns: `repeat(${W}, 1fr)`, aspectRatio: '1.3' }">
+      <div class="game-tile-map bg-void-deep p-1 border border-surface-600" :style="{ '--columns': W }">
         <template v-for="(row, y) in map" :key="`r-${y}`">
           <div
             v-for="(tile, x) in row"
             :key="`c-${y}-${x}`"
-            class="aspect-square border border-surface-700 grid place-items-center text-xs"
+            class="game-map-cell border border-surface-700"
             :class="player.x === x && player.y === y ? 'border-amber' : ''"
           >
             <span v-if="player.x === x && player.y === y" class="phosphor text-shadow-neon font-bold">P</span>

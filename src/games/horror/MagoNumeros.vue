@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -115,17 +116,15 @@ function onQuit() { router.push('/') }
         >{{ n }}</button>
       </div>
       <div class="flex items-center gap-2">
-        <input v-model="a" type="number" min="0" max="9" class="flex-1 bg-void-deep border border-surface-600 px-2 py-1 text-amber text-center outline-none focus:border-phosphor-green" />
+        <input v-model="a" :aria-label="locale.isPt ? 'Primeiro número da soma' : 'First number to add'" type="number" min="0" max="9" class="flex-1 bg-void-deep border border-surface-600 px-2 py-1 text-amber text-center outline-none focus:border-phosphor-green" />
         <span class="text-cyan">+</span>
-        <input v-model="b" type="number" min="0" max="9" class="flex-1 bg-void-deep border border-surface-600 px-2 py-1 text-amber text-center outline-none focus:border-phosphor-green" />
+        <input v-model="b" :aria-label="locale.isPt ? 'Segundo número da soma' : 'Second number to add'" type="number" min="0" max="9" class="flex-1 bg-void-deep border border-surface-600 px-2 py-1 text-amber text-center outline-none focus:border-phosphor-green" />
         <span class="text-cyan">=</span>
         <span class="text-amber text-2xl font-display w-12 text-center">{{ d1 + d2 }}</span>
       </div>
       <button v-if="status === 'playing'" class="arcade-btn w-full" @click="nextTurn">{{ locale.current === 'pt-BR' ? 'Passar vez' : 'Pass turn' }}</button>
       <button v-if="status === 'playing'" class="arcade-btn arcade-btn-amber w-full" @click="submit">▶ SUBMIT</button>
-      <div class="border border-surface-600 bg-surface-800 p-2 h-16 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" class="border border-surface-600 bg-surface-800 p-2 h-16 text-xs space-y-0.5" />
       <p v-if="status === 'won'" class="amber-phosphor text-shadow-neon font-display text-center">★ DERROTOU O MAGO ★</p>
       <p v-else-if="status === 'lost'" class="danger-phosphor text-shadow-neon font-display text-center">✕ MAGO VENCEU ✕</p>
     </div>

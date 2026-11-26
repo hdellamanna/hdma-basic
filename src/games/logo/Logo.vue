@@ -7,6 +7,7 @@ const edition = defineProps<{ remastered?: boolean }>()
  */
 import { ref, onMounted, watch, nextTick } from 'vue'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import { LogoInterpreter, type TurtleState, type Procedure } from './interpreter'
 
@@ -23,6 +24,7 @@ const state = ref<TurtleState>({
   color: '#7CFC00', width: 2,
 })
 const log = ref<string[]>([])
+const firstLogIndex = ref(0)
 const labels = ref<{ text: string; x: number; y: number }[]>([])
 const started = ref(false)
 const rosette = 'REPEAT 12 [REPEAT 4 [FD 55 RT 90] RT 30]'
@@ -154,7 +156,10 @@ function setupCanvas() {
 
 function appendLog(msg: string) {
   log.value.push(msg)
-  if (log.value.length > 200) log.value.shift()
+  if (log.value.length > 200) {
+    log.value.shift()
+    firstLogIndex.value++
+  }
 }
 
 async function runCode(code: string) {
@@ -255,6 +260,7 @@ defineExpose({ clearAll })
       <span class="phosphor self-center text-amber text-lg pr-1">{{ i18n.prompt }}</span>
       <input
         v-model="input"
+        :aria-label="locale.isPt ? 'Comando Logo' : 'Logo command'"
         @keyup.enter="submit"
         @keyup="onKeyUp"
         class="flex-1 bg-transparent text-amber outline-none placeholder-ink-dim text-sm min-w-0"
@@ -300,11 +306,10 @@ defineExpose({ clearAll })
     </div>
 
     <!-- Output log -->
-    <div class="border border-surface-600 bg-void-deep p-2 h-32 overflow-y-auto text-[11px] font-mono">
-      <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      <p v-if="!log.length" class="text-ink-dim italic">
+    <GameLog :entries="log" :first-index="firstLogIndex" class="border border-surface-600 bg-void-deep p-2 h-32 text-[11px] font-mono">
+      <p class="text-ink-dim italic">
         {{ locale.current === 'pt-BR' ? 'Turtle pronta. Digite FD 50 para começar.' : 'Turtle ready. Type FD 50 to start.' }}
       </p>
-    </div>
+    </GameLog>
   </div>
 </template>

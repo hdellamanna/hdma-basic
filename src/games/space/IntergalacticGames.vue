@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -96,14 +97,13 @@ function onQuit() { router.push('/') }
     <div v-else class="font-mono space-y-2 text-amber">
       <p class="text-cyan text-lg">{{ ui.target[locale.current] }} <span class="font-bold">{{ h }}</span></p>
       <p class="text-ink-muted text-xs">Tries: <span :class="tries >= 6 ? 'danger-phosphor' : 'text-amber'">{{ tries }}/8</span></p>
-      <div class="border border-surface-600 bg-surface-800 p-3 h-32 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" class="border border-surface-600 bg-surface-800 p-3 h-32 text-xs space-y-0.5" />
       <form v-if="status === 'playing'" class="space-y-1" @submit.prevent="submit">
         <div class="flex items-center gap-2">
           <span class="text-cyan w-24">A:</span>
           <input
             v-model="angle"
+            :aria-label="locale.isPt ? 'A · Ângulo de lançamento' : 'A · Launch angle'"
             type="number"
             min="0"
             max="70"
@@ -115,6 +115,7 @@ function onQuit() { router.push('/') }
           <span class="text-cyan w-24">V:</span>
           <input
             v-model="speed"
+            :aria-label="locale.isPt ? 'V · Velocidade de lançamento' : 'V · Launch speed'"
             type="number"
             min="0"
             max="40000"

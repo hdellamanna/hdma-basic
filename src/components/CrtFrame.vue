@@ -49,14 +49,14 @@ function onQuit() {
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
+  <div class="game-frame flex flex-col gap-2">
     <!-- HUD bar -->
     <div
       v-if="showHud"
-      class="flex flex-wrap gap-2 items-center justify-between border border-surface-600 bg-surface-800 px-3 py-1.5 text-[10px] font-display tracking-widest"
+      class="game-toolbar flex flex-wrap gap-2 items-center justify-between border border-surface-600 bg-surface-800 px-3 py-1.5 text-[10px] font-display tracking-widest"
     >
-      <div class="flex flex-wrap items-center gap-3">
-        <span v-if="title" :class="accent">{{ title }}</span>
+      <div class="game-readouts flex flex-wrap items-center gap-3">
+        <span v-if="title" class="game-frame-title" :class="accent">{{ title }}</span>
         <span v-if="props.score !== undefined" class="text-ink-muted">
           {{ t('score', locale.current) }}: <span class="text-amber">{{ props.score }}</span>
         </span>
@@ -64,7 +64,7 @@ function onQuit() {
           {{ t('lives', locale.current) }}: <span class="text-danger">{{ '♥'.repeat(Math.max(0, props.lives)) }}</span>
         </span>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="game-actions flex items-center gap-2" @keydown.stop @keyup.stop>
         <button class="arcade-btn-ghost border border-surface-600 px-2 py-0.5 text-[9px] hover:border-ink-muted transition" @click="onRestart">
           ↺ {{ t('restart', locale.current) }}
         </button>

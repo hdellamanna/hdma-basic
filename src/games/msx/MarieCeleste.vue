@@ -6,6 +6,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import { useKeyboard } from '../../composables/useKeyboard'
 import CrtFrame from '../../components/CrtFrame.vue'
@@ -283,13 +284,12 @@ function onQuit() { router.push('/') }
       <button class="arcade-btn arcade-btn-amber" @click="start">▶ START</button>
     </div>
     <div v-else class="font-mono text-sm leading-relaxed flex flex-col h-[60vh] min-h-[420px]">
-      <div class="flex-1 overflow-y-auto pr-2 space-y-0.5 phosphor">
-        <p v-for="(m, i) in log" :key="i" class="whitespace-pre-wrap" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" preserve-whitespace class="flex-1 pr-2 space-y-0.5 phosphor" />
       <form v-if="status === 'playing'" class="mt-3 flex items-center gap-2 border-t border-surface-600 pt-3" @submit.prevent="submit">
         <span class="phosphor">{{ ui.prompt[locale.current] }}</span>
         <input
           v-model="input"
+          :aria-label="locale.isPt ? 'Comando da aventura' : 'Adventure command'"
           class="flex-1 bg-transparent border-none outline-none text-amber font-mono placeholder-ink-dim"
           :placeholder="locale.current === 'pt-BR' ? 'IR NORTE  /  PEGAR CHAVE  /  EXAMINAR BILHETE' : 'GO NORTH  /  GET KEY  /  EXAMINE NOTE'"
           autofocus

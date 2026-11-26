@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -148,12 +149,11 @@ function onQuit() { router.push('/') }
           :style="{ left: `${(p.x / (W - 1)) * 100}%`, top: `${(p.y / (W - 1)) * 100}%`, transform: 'translate(-50%, -50%)' }"
         >{{ p.n }}</div>
       </div>
-      <div class="border border-surface-600 bg-surface-800 p-2 h-16 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log.slice(-5)" :key="i" :class="i === log.slice(-5).length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" :limit="5" class="border border-surface-600 bg-surface-800 p-2 h-16 text-xs space-y-0.5" />
       <form v-if="phase === 'ask'" class="flex gap-1" @submit.prevent="submit">
         <input
           v-model="input"
+          :aria-label="locale.isPt ? 'Número que se moveu' : 'Number that moved'"
           type="number"
           min="1"
           max="9"
