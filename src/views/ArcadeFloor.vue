@@ -4,6 +4,7 @@ import { RouterLink } from 'vue-router'
 import { useLocaleStore } from '../stores/locale'
 import { GAMES } from '../data/games'
 import { MANUALS } from '../data/manuals'
+import { pavilionSizes, pavilionSrcset } from '../data/pavilion'
 
 const locale = useLocaleStore()
 const tr = (pt: string, en: string) => (locale.isPt ? pt : en)
@@ -122,12 +123,8 @@ function selectCabinet(index: number) {
           <picture>
             <source
               type="image/avif"
-              srcset="
-                /images/floor/pavilion-480.avif   480w,
-                /images/floor/pavilion-768.avif   768w,
-                /images/floor/pavilion-1152.avif 1152w
-              "
-              sizes="(max-width: 760px) 95vw, (max-width: 1440px) 57vw, 790px"
+              :srcset="pavilionSrcset"
+              :sizes="pavilionSizes"
             />
             <img
               src="/images/arcade-pavilion-640.webp"
