@@ -293,9 +293,9 @@ function selectCabinet(index: number) {
         <li v-for="manual in manuals" :key="manual.id">
           <RouterLink :to="{ name: 'manual', params: { id: manual.id } }">
             <img
-              :src="'/images/salons/' + manual.id + '.webp'"
-              width="300"
-              height="300"
+              :src="'/images/floor/books/' + manual.id + '.webp'"
+              width="128"
+              height="128"
               alt=""
               loading="lazy"
               decoding="async"
