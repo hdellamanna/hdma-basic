@@ -19,7 +19,7 @@ const { muted, toggleMute } = useAudio()
       <RouterLink to="/about">{{ locale.isPt ? 'História' : 'History' }}</RouterLink>
     </div>
     <div class="arcade-settings">
-      <button type="button" :aria-pressed="muted" :aria-label="locale.isPt ? 'Silenciar som' : 'Mute sound'" @click="toggleMute">
+      <button type="button" :aria-pressed="!muted"  @click="toggleMute">
         {{ locale.isPt ? (muted ? 'Som: desligado' : 'Som: ligado') : (muted ? 'Sound: off' : 'Sound: on') }}
       </button>
       <div class="arcade-languages" role="group" :aria-label="t('language', locale.current)">
