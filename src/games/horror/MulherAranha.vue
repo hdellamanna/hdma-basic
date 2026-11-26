@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -111,13 +112,12 @@ function onQuit() { router.push('/') }
     </div>
     <div v-else class="font-mono space-y-2">
       <p class="text-cyan text-xs">TRIES <span :class="tries < 5 ? 'danger-phosphor' : 'text-amber'">{{ tries }}</span></p>
-      <div class="border border-surface-600 bg-surface-800 p-2 h-32 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" class="border border-surface-600 bg-surface-800 p-2 h-32 text-xs space-y-0.5" />
       <form v-if="status === 'playing'" class="space-y-1" @submit.prevent="submit">
         <div class="flex gap-1">
           <input
             v-model="input"
+            :aria-label="canGuess ? (locale.isPt ? 'Palpite de letra' : 'Letter guess') : (locale.isPt ? 'Palavra' : 'Word')"
             :placeholder="canGuess ? (locale.current === 'pt-BR' ? 'Palpite (letra)' : 'Guess (letter)') : (locale.current === 'pt-BR' ? 'Palavra' : 'Word')"
             class="flex-1 bg-void-deep border border-surface-600 px-2 py-1 text-amber text-center outline-none focus:border-phosphor-green"
             autofocus

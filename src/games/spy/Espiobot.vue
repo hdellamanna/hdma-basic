@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import { useRoundTimer } from '../../composables/useRoundTimer'
 import CrtFrame from '../../components/CrtFrame.vue'
@@ -134,9 +135,7 @@ function onQuit() { router.push('/') }
         <button class="arcade-btn text-[10px] py-2" @click="submitChar('E')">E / ◀</button>
         <button class="arcade-btn text-[10px] py-2" @click="submitChar('D')">D / ▶</button>
       </div>
-      <div class="border border-surface-600 bg-surface-800 p-2 h-16 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log.slice(-4)" :key="i" :class="i === log.slice(-4).length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" :limit="4" class="border border-surface-600 bg-surface-800 p-2 h-16 text-xs space-y-0.5" />
       <p v-if="status === 'won'" class="amber-phosphor text-shadow-neon font-display text-center">★ ESPIÃO SUPREMO ★</p>
     </div>
   </CrtFrame>

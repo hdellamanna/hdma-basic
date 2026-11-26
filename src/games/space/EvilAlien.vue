@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -78,13 +79,11 @@ function onQuit() { router.push('/') }
     </div>
     <div v-else class="font-mono space-y-2 text-amber">
       <p class="text-danger text-lg">BOMBS: <span class="font-bold">{{ bombs }}</span></p>
-      <div class="border border-surface-600 bg-surface-800 p-3 h-32 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" class="border border-surface-600 bg-surface-800 p-3 h-32 text-xs space-y-0.5" />
       <form v-if="status === 'playing'" class="grid grid-cols-3 gap-1" @submit.prevent="submit">
-        <input v-model="xi" type="number" min="0" max="9" placeholder="X" class="bg-void-deep border border-surface-600 px-2 py-1 text-amber outline-none focus:border-phosphor-green text-center" />
-        <input v-model="yi" type="number" min="0" max="9" placeholder="Y" class="bg-void-deep border border-surface-600 px-2 py-1 text-amber outline-none focus:border-phosphor-green text-center" />
-        <input v-model="di" type="number" min="0" max="9" placeholder="D" class="bg-void-deep border border-surface-600 px-2 py-1 text-amber outline-none focus:border-phosphor-green text-center" />
+        <input v-model="xi" :aria-label="locale.isPt ? 'Coordenada X' : 'X coordinate'" type="number" min="0" max="9" placeholder="X" class="bg-void-deep border border-surface-600 px-2 py-1 text-amber outline-none focus:border-phosphor-green text-center" />
+        <input v-model="yi" :aria-label="locale.isPt ? 'Coordenada Y' : 'Y coordinate'" type="number" min="0" max="9" placeholder="Y" class="bg-void-deep border border-surface-600 px-2 py-1 text-amber outline-none focus:border-phosphor-green text-center" />
+        <input v-model="di" :aria-label="locale.isPt ? 'Distância D' : 'Distance D'" type="number" min="0" max="9" placeholder="D" class="bg-void-deep border border-surface-600 px-2 py-1 text-amber outline-none focus:border-phosphor-green text-center" />
         <button class="col-span-3 arcade-btn">💣 FIRE</button>
       </form>
       <p v-else-if="status === 'won'" class="amber-phosphor text-shadow-neon font-display text-center py-2">★ BOOM! ★</p>

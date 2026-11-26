@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -105,12 +106,11 @@ function onQuit() { router.push('/') }
     </div>
     <div v-else class="font-mono space-y-2">
       <p class="text-cyan text-xs">SCORE <span :class="score < 100 ? 'danger-phosphor' : 'amber-phosphor'">{{ score }}</span> / 500</p>
-      <div class="border border-surface-600 bg-surface-800 p-2 h-32 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log.slice(-8)" :key="i" :class="i === log.slice(-8).length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" :limit="8" class="border border-surface-600 bg-surface-800 p-2 h-32 text-xs space-y-0.5" />
       <form v-if="status === 'playing'" class="flex gap-1" @submit.prevent="submit">
         <input
           v-model="input"
+          :aria-label="locale.isPt ? 'Número a repetir' : 'Number to repeat'"
           type="number"
           min="1"
           max="9"

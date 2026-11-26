@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -118,9 +119,7 @@ function onQuit() { router.push('/') }
           <div :class="pulse > 100 ? 'danger-phosphor' : 'text-amber'">{{ pulse }}</div>
         </div>
       </div>
-      <div class="border border-surface-600 bg-surface-800 p-2 h-32 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" class="border border-surface-600 bg-surface-800 p-2 h-32 text-xs space-y-0.5" />
       <div v-if="status === 'playing'" class="grid grid-cols-2 gap-1">
         <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-1.5" @click="retreat">R Retreat</button>
         <button class="arcade-btn arcade-btn-amber" @click="go">G Go</button>

@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import { useGameLoop } from '../../composables/useGameLoop'
 import { useRoundTimer } from '../../composables/useRoundTimer'
@@ -150,9 +151,7 @@ function onQuit() { router.push('/') }
         <button class="arcade-btn arcade-btn-amber text-[10px] py-1.5" :disabled="landed || status !== 'playing'" @click="burn(3, 0)">▼ BRAKE</button>
         <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-1.5" :disabled="landed || status !== 'playing'" @click="burn(0, 2)">R ▶</button>
       </div>
-      <div class="border border-surface-600 bg-surface-800 p-2 h-16 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" class="border border-surface-600 bg-surface-800 p-2 h-16 text-xs space-y-0.5" />
       <p v-if="status === 'won'" class="amber-phosphor text-shadow-neon font-display text-center">★ ALL TOUCHDOWNS ★</p>
       <p v-else-if="status === 'lost'" class="danger-phosphor text-shadow-neon font-display text-center">✕ CRASHED ✕</p>
     </div>

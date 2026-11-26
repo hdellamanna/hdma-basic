@@ -7,6 +7,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../stores/locale'
+import GameLog from '../components/GameLog.vue'
 import { useAudio } from '../composables/useAudio'
 import { useKeyboard } from '../composables/useKeyboard'
 import CrtFrame from '../components/CrtFrame.vue'
@@ -118,6 +119,7 @@ const turns = ref(0)
 const inventory = ref<string[]>([])
 const currentRoom = ref<number>(0)
 const log = ref<string[]>([])
+const firstLogIndex = ref(0)
 const gameOver = ref(false)
 const escaped = ref(false)
 const won = ref(false)
@@ -271,7 +273,10 @@ const objectsInRoom = computed(() => {
 function logMsg(msg: string, color = 'text-amber') {
   log.value.push(msg)
   messageColor.value = color
-  if (log.value.length > 80) log.value.shift()
+  if (log.value.length > 80) {
+    log.value.shift()
+    firstLogIndex.value++
+  }
 }
 
 function findObjectIdx(name: string): number {
@@ -617,6 +622,7 @@ function reset() {
   inventory.value = []
   currentRoom.value = 0
   log.value = []
+  firstLogIndex.value = 0
   gameOver.value = false
   escaped.value = false
   won.value = false
@@ -686,17 +692,7 @@ function onQuit() {
       </button>
     </div>
     <div v-else class="font-mono text-sm leading-relaxed h-[60vh] min-h-[420px] flex flex-col">
-      <div
-        ref="logBox"
-        class="flex-1 overflow-y-auto pr-2 space-y-0.5 text-amber"
-      >
-        <p
-          v-for="(m, i) in log"
-          :key="i"
-          class="whitespace-pre-wrap"
-          :class="(i === log.length - 1) ? messageColor : (i < log.length - 1 ? 'text-ink-dim' : 'text-ink-muted')"
-        >{{ m }}</p>
-      </div>
+      <GameLog :entries="log" preserve-whitespace :latest-color="messageColor" :first-index="firstLogIndex" class="flex-1 pr-2 space-y-0.5 text-amber" />
       <form
         v-if="!gameOver"
         class="mt-3 flex items-center gap-2 border-t border-surface-600 pt-3"
@@ -705,6 +701,7 @@ function onQuit() {
         <span class="phosphor">{{ ui.prompt[locale.current] }}</span>
         <input
           v-model="input"
+          :aria-label="locale.isPt ? 'Comando da aventura' : 'Adventure command'"
           class="flex-1 bg-transparent border-none outline-none text-amber font-mono placeholder-ink-dim"
           :placeholder="locale.current === 'pt-BR' ? 'PEGAR CHAVE  /  IR NORTE  /  EXAMINAR ESPELHO' : 'GET KEY  /  GO NORTH  /  EXAMINE MIRROR'"
           autofocus

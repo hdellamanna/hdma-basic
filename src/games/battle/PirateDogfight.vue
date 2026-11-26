@@ -100,6 +100,8 @@ function move(dx: number, dy: number) {
 
 function onKey(e: KeyboardEvent) {
   if (status.value !== 'playing') return
+  if (e.ctrlKey || e.altKey || e.metaKey || (e.key === ' ' && e.target instanceof HTMLButtonElement)) return
+  if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) e.preventDefault()
   if (e.key === 'ArrowLeft' || e.key === 'a') move(-12, 0)
   if (e.key === 'ArrowRight' || e.key === 'd') move(12, 0)
   if (e.key === 'ArrowUp' || e.key === 'w') move(0, -10)
@@ -138,30 +140,32 @@ function onQuit() { router.push('/') }
           :key="i"
           v-show="p.alive"
           class="absolute danger-phosphor font-bold"
-          :style="{ left: `${p.x}px`, top: `${p.y}px`, transform: 'translate(-50%, -50%)' }"
+          :style="{ left: `${p.x / W * 100}%`, top: `${p.y / H * 100}%`, transform: 'translate(-50%, -50%)' }"
         >☠</div>
         <div
           v-for="(b, i) in bullets"
           :key="`b-${i}`"
           class="absolute w-0.5 h-2 bg-phosphor-green"
-          :style="{ left: `${b.x}px`, top: `${b.y}px` }"
+          :style="{ left: `${b.x / W * 100}%`, top: `${b.y / H * 100}%` }"
         ></div>
         <div
           v-for="(b, i) in pBullets"
           :key="`eb-${i}`"
           class="absolute w-0.5 h-2 bg-danger"
-          :style="{ left: `${b.x}px`, top: `${b.y}px` }"
+          :style="{ left: `${b.x / W * 100}%`, top: `${b.y / H * 100}%` }"
         ></div>
         <div
           class="absolute phosphor font-bold"
-          :style="{ left: `${shipX}px`, top: `${shipY}px`, transform: 'translate(-50%, -50%)' }"
+          :style="{ left: `${shipX / W * 100}%`, top: `${shipY / H * 100}%`, transform: 'translate(-50%, -50%)' }"
         >▲</div>
       </div>
       <p class="text-xs text-amber">SCORE <span class="font-bold">{{ score }}</span>/100</p>
-      <div class="grid grid-cols-3 gap-1 sm:hidden">
-        <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-1" @click="move(-12, 0)">←</button>
-        <button class="arcade-btn arcade-btn-amber text-[10px] py-1" @click="shoot">FIRE</button>
-        <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-1" @click="move(12, 0)">→</button>
+      <div v-if="status === 'playing'" class="grid grid-cols-3 gap-2">
+        <button class="min-h-11 touch-manipulation arcade-btn-ghost col-start-2" :aria-label="locale.current === 'pt-BR' ? 'Subir' : 'Move up'" @click="move(0, -10)">↑</button>
+        <button class="min-h-11 touch-manipulation arcade-btn-ghost col-start-1 border border-surface-600 text-[10px] py-1" :aria-label="locale.current === 'pt-BR' ? 'Mover para a esquerda' : 'Move left'" @click="move(-12, 0)">←</button>
+        <button class="min-h-11 touch-manipulation arcade-btn arcade-btn-amber text-[10px] py-1" @click="shoot">FIRE</button>
+        <button class="min-h-11 touch-manipulation arcade-btn-ghost border border-surface-600 text-[10px] py-1" :aria-label="locale.current === 'pt-BR' ? 'Mover para a direita' : 'Move right'" @click="move(12, 0)">→</button>
+        <button class="min-h-11 touch-manipulation arcade-btn-ghost col-start-2" :aria-label="locale.current === 'pt-BR' ? 'Descer' : 'Move down'" @click="move(0, 10)">↓</button>
       </div>
       <p v-if="status === 'won'" class="amber-phosphor text-shadow-neon font-display text-center">★ ACE PILOT ★</p>
       <p v-else-if="status === 'lost'" class="danger-phosphor text-shadow-neon font-display text-center">✕ SHOT DOWN ✕</p>

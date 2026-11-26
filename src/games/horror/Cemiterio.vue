@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import '../tile-map.css'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -129,12 +131,12 @@ function onQuit() { router.push('/') }
         <span class="text-cyan">TURN <span :class="turn > 32 ? 'danger-phosphor' : 'text-amber'">{{ turn }}</span>/40</span>
         <span class="text-amber">DIGS {{ moves }}/5</span>
       </p>
-      <div class="grid gap-0.5 bg-void-deep p-1 border border-surface-600" :style="{ gridTemplateColumns: `repeat(${W}, 1fr)` }">
+      <div class="game-tile-map bg-void-deep p-1 border border-surface-600" :style="{ '--columns': W }">
         <template v-for="y in H" :key="`r-${y}`">
           <div
             v-for="x in W"
             :key="`c-${y}-${x}`"
-            class="aspect-square border border-surface-700 grid place-items-center text-xs"
+            class="game-map-cell border border-surface-700"
             :class="player.x === x - 1 && player.y === y - 1 ? 'border-amber' : ''"
           >
             <span v-if="x === 1 || x === W || y === 1 || y === H" class="text-ink-dim">:</span>
@@ -154,9 +156,7 @@ function onQuit() { router.push('/') }
         <div></div>
         <button class="arcade-btn arcade-btn-amber text-[10px] py-1" @click="dig">DIG</button>
       </div>
-      <div class="border border-surface-600 bg-surface-800 p-2 h-12 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" class="border border-surface-600 bg-surface-800 p-2 h-12 text-xs space-y-0.5" />
       <p v-if="status === 'won'" class="amber-phosphor text-shadow-neon font-display text-center">★ ESCAPED ★</p>
       <p v-else-if="status === 'lost'" class="danger-phosphor text-shadow-neon font-display text-center">✕ DOOMED ✕</p>
     </div>

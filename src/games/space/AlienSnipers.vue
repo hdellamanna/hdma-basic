@@ -25,8 +25,8 @@ function spawnTarget() {
   const ch = containerRef.value?.clientHeight ?? 400
   targets.value.push({
     id: Date.now() + Math.random(),
-    x: 20 + Math.random() * (cw - 60),
-    y: 20 + Math.random() * (ch - 60),
+    x: 22 + Math.random() * Math.max(0, cw - 44),
+    y: 22 + Math.random() * Math.max(0, ch - 44),
     expiresAt: performance.now() + 1200 + Math.random() * 1000,
   })
 }
@@ -107,15 +107,17 @@ function onQuit() { router.push('/') }
       <div
         ref="containerRef"
         class="relative bg-void-deep border border-surface-600 overflow-hidden cursor-crosshair"
-        style="aspect-ratio: 1; min-height: 360px;"
+        style="width: 100%; aspect-ratio: 1;"
       >
-        <div
+        <button
+          type="button"
+          :aria-label="locale.isPt ? 'Alienígena' : 'Alien'"
           v-for="t in targets"
           :key="t.id"
-          class="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer danger-phosphor text-3xl animate-pulse"
+          class="absolute h-11 w-11 -translate-x-1/2 -translate-y-1/2 cursor-pointer danger-phosphor text-3xl"
           :style="{ left: `${t.x}px`, top: `${t.y}px` }"
           @click="onClick(t)"
-        >👽</div>
+        >👽</button>
         <p v-if="targets.length === 0" class="absolute inset-0 grid place-items-center text-ink-dim text-xs">
           {{ locale.current === 'pt-BR' ? 'Aguardando alvos...' : 'Waiting for targets...' }}
         </p>

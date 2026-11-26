@@ -21,7 +21,7 @@ function start() {
   if (drawTimer !== null) clearTimeout(drawTimer)
   status.value = 'playing'
   phase.value = 'count'
-  log.value = ['1...2...3...4...5...6...7...8...9...10']
+  log.value = ['1… 2… 3… 4… 5… 6… 7… 8… 9… 10']
   sfx.tick()
   // random delay 1.5-4s
   const delay = 1500 + Math.random() * 2500

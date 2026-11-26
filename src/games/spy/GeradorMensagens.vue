@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -117,6 +118,7 @@ function onQuit() { router.push('/') }
       <form v-if="phase !== 'result'" class="space-y-2" @submit.prevent="phase === 'encode' ? encode() : decode()">
         <input
           v-model="input"
+          :aria-label="phase === 'encode' ? (locale.isPt ? 'Mensagem para codificar' : 'Message to encode') : (locale.isPt ? 'Código para decodificar' : 'Code to decode')"
           :placeholder="phase === 'encode' ? (locale.current === 'pt-BR' ? 'Sua mensagem (A-Z)' : 'Your message (A-Z)') : (locale.current === 'pt-BR' ? 'Código para decodificar' : 'Code to decode')"
           class="w-full bg-void-deep border border-surface-600 px-2 py-2 text-amber outline-none focus:border-phosphor-green font-mono"
           autofocus
@@ -132,9 +134,7 @@ function onQuit() { router.push('/') }
         </div>
         <button class="arcade-btn-ghost border border-surface-600 w-full text-[10px] py-1.5" @click="phase = 'menu'; output = ''; input = ''">↺ {{ locale.current === 'pt-BR' ? 'OUTRA' : 'ANOTHER' }}</button>
       </div>
-      <div class="border border-surface-600 bg-surface-800 p-2 h-20 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log.slice(-3)" :key="i" :class="i === log.slice(-3).length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" :limit="3" class="border border-surface-600 bg-surface-800 p-2 h-20 text-xs space-y-0.5" />
     </div>
   </CrtFrame>
 </template>

@@ -123,6 +123,8 @@ function move(dx: number) {
 
 function onKey(e: KeyboardEvent) {
   if (status.value !== 'playing') return
+  if (e.ctrlKey || e.altKey || e.metaKey || (e.key === ' ' && e.target instanceof HTMLButtonElement)) return
+  if (['ArrowLeft', 'ArrowRight'].includes(e.key)) e.preventDefault()
   if (e.key === 'ArrowLeft' || e.key === 'a') move(-15)
   if (e.key === 'ArrowRight' || e.key === 'd') move(15)
   if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') { e.preventDefault(); shoot() }
@@ -159,29 +161,29 @@ function onQuit() { router.push('/') }
           :key="i"
           v-show="inv.alive"
           class="absolute danger-phosphor text-xs font-bold"
-          :style="{ left: `${inv.x}px`, top: `${inv.y}px`, transform: 'translate(-50%, -50%)' }"
+          :style="{ left: `${inv.x / W * 100}%`, top: `${inv.y / H * 100}%`, transform: 'translate(-50%, -50%)' }"
         >[{{ inv.row % 2 ? 'M' : 'W' }}]</div>
         <div
           v-for="(b, i) in bullets"
           :key="`b-${i}`"
           class="absolute w-0.5 h-3 bg-phosphor-green shadow-neon-green"
-          :style="{ left: `${b.x}px`, top: `${b.y}px` }"
+          :style="{ left: `${b.x / W * 100}%`, top: `${b.y / H * 100}%` }"
         ></div>
         <div
           v-for="(b, i) in enemyBullets"
           :key="`eb-${i}`"
           class="absolute w-0.5 h-3 bg-danger shadow-neon-red"
-          :style="{ left: `${b.x}px`, top: `${b.y}px` }"
+          :style="{ left: `${b.x / W * 100}%`, top: `${b.y / H * 100}%` }"
         ></div>
         <div
           class="absolute phosphor text-shadow-neon font-bold"
-          :style="{ left: `${shipX}px`, bottom: '10px', transform: 'translateX(-50%)' }"
+          :style="{ left: `${shipX / W * 100}%`, top: `${(H - 20) / H * 100}%`, transform: 'translate(-50%, -50%)' }"
         >▲</div>
       </div>
-      <div class="grid grid-cols-3 gap-1 sm:hidden">
-        <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-1" @click="move(-15)">◀</button>
-        <button class="arcade-btn arcade-btn-amber text-[10px] py-1" @click="shoot">FIRE</button>
-        <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-1" @click="move(15)">▶</button>
+      <div v-if="status === 'playing'" class="grid grid-cols-3 gap-2">
+        <button class="min-h-11 touch-manipulation arcade-btn-ghost border border-surface-600 text-[10px] py-1" :aria-label="locale.current === 'pt-BR' ? 'Mover para a esquerda' : 'Move left'" @click="move(-15)">◀</button>
+        <button class="min-h-11 touch-manipulation arcade-btn arcade-btn-amber text-[10px] py-1" @click="shoot">FIRE</button>
+        <button class="min-h-11 touch-manipulation arcade-btn-ghost border border-surface-600 text-[10px] py-1" :aria-label="locale.current === 'pt-BR' ? 'Mover para a direita' : 'Move right'" @click="move(15)">▶</button>
       </div>
       <p v-if="status === 'won'" class="amber-phosphor text-shadow-neon font-display text-center">★ EARTH SAVED ★</p>
       <p v-else-if="status === 'lost'" class="danger-phosphor text-shadow-neon font-display text-center">✕ INVADED ✕</p>

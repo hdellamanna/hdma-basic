@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -81,9 +82,7 @@ function onQuit() { router.push('/') }
           >{{ col + 1 }}</button>
         </div>
       </div>
-      <div class="border border-surface-600 bg-surface-800 p-2 h-16 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" class="border border-surface-600 bg-surface-800 p-2 h-16 text-xs space-y-0.5" />
       <p v-if="status === 'won'" class="amber-phosphor text-shadow-neon font-display text-center">★ EXACTLY ★</p>
       <p v-else-if="status === 'lost'" class="danger-phosphor text-shadow-neon font-display text-center">✕ CURSE ✕</p>
     </div>

@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../../stores/locale'
+import GameLog from '../../components/GameLog.vue'
 import { useAudio } from '../../composables/useAudio'
 import CrtFrame from '../../components/CrtFrame.vue'
 
@@ -140,9 +141,7 @@ function onQuit() { router.push('/') }
           :style="{ left: `${witch.x * 10}%`, top: `${witch.y * 20}%`, transform: 'translate(-50%, -50%)' }"
         >★</div>
       </div>
-      <div class="border border-surface-600 bg-surface-800 p-2 h-24 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" class="border border-surface-600 bg-surface-800 p-2 h-24 text-xs space-y-0.5" />
       <div class="grid grid-cols-3 gap-1 sm:hidden">
         <div></div>
         <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-1" @click="move(0, -1)">↑</button>

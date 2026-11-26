@@ -118,7 +118,7 @@ function onQuit() { router.push('/') }
     </div>
     <div v-else class="font-mono space-y-2">
       <p class="text-cyan text-xs">MOVES <span class="text-amber">{{ moves }}</span></p>
-      <div class="bg-void-deep border border-surface-600 p-3 text-center phosphor font-display text-3xl space-y-1">
+      <div class="bg-void-deep border border-surface-600 p-3 text-center phosphor font-mono whitespace-pre text-3xl space-y-1">
         <p>██ {{ view[0].cells[1] }} ██</p>
         <p>██ {{ view[1].cells.join('') }} ██</p>
         <p>██ {{ view[2].cells[1] }} ██</p>

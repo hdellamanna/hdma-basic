@@ -24,7 +24,7 @@ export const GAMES: GameManifest[] = [
         objective: 'Encontrar os 7 tesouros e sair vivo da casa mal-assombrada.',
         instructions:
           'Digite comandos com até duas palavras. Comandos: IR [direção], PEGAR [objeto], LARGAR, EXAMINAR, INVENTARIO, SCORE/PONTOS, AJUDA, SAIR. Direções: NORTE, SUL, LESTE, OESTE, CIMA, BAIXO (ou N, S, L, O, C, B).',
-        controlsHint: '↑↓←→ nas escolhas · ENTER para confirmar',
+        controlsHint: 'Digite um comando e pressione Enter.',
       },
       en: {
         title: 'Haunted House',
@@ -32,7 +32,7 @@ export const GAMES: GameManifest[] = [
         objective: 'Find the 7 treasures and escape the haunted house alive.',
         instructions:
           'Type up to two-word commands. Verbs: GO [dir], GET, DROP, EXAMINE, INVENTORY, SCORE, HELP, QUIT. Directions: NORTH, SOUTH, EAST, WEST, UP, DOWN (or N, S, E, W, U, D).',
-        controlsHint: '↑↓←→ on choices · ENTER to confirm',
+        controlsHint: 'Type a command and press Enter.',
       },
     },
   },
@@ -146,22 +146,22 @@ export const GAMES: GameManifest[] = [
     year: 1982,
     difficulty: 3,
     genre: 'simulation',
-    controls: 'typing',
+    controls: 'click',
     avgDurationSec: 120,
     i18n: {
       'pt-BR': {
         title: 'Moonlander',
         shortDesc: 'Pouse a nave lunar sem destruir. Gerenciamento de combustível e empuxo.',
-        objective: 'Pousar com velocidade ≤ 5 m/s e combustível > 0.',
+        objective: 'Tocar o solo a no máximo 5 m/s.',
         instructions:
-          'Cada turno entre com a queima de combustível (em unidades por segundo). Cuidado com a gravidade.',
+          'Inicie a descida e acompanhe a altitude, a velocidade e o combustível. Use os níveis de empuxo 1, 2 e 3 para frear. Use OFF para desligar o motor.',
       },
       en: {
         title: 'Moonlander',
         shortDesc: 'Land the lunar module without crashing. Manage fuel and thrust.',
-        objective: 'Touch down at ≤ 5 m/s with fuel > 0.',
+        objective: 'Touch down at no more than 5 m/s.',
         instructions:
-          'Each turn, enter the fuel burn (units per second). Mind the gravity.',
+          'Start the descent and watch your altitude, speed and fuel. Select thrust levels 1, 2 or 3 to slow down. Select OFF to cut the engine.',
       },
     },
   },

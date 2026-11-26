@@ -6,6 +6,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocaleStore } from '../stores/locale'
+import GameLog from '../components/GameLog.vue'
 import { useAudio } from '../composables/useAudio'
 import CrtFrame from '../components/CrtFrame.vue'
 
@@ -298,6 +299,7 @@ function onQuit() { router.push('/') }
       <p class="text-ink-muted text-sm">{{ ui.intro[locale.current] }}</p>
       <input
         v-model="heroName"
+        :aria-label="locale.isPt ? 'Nome do herói' : 'Hero name'"
         :placeholder="ui.hero[locale.current]"
         class="bg-void-deep border border-surface-600 px-3 py-1 text-amber text-center outline-none focus:border-phosphor-green"
         @keyup.enter="startName"
@@ -353,9 +355,7 @@ function onQuit() { router.push('/') }
         <p v-if="room.monster" class="danger-phosphor">⚔ {{ room.monster }}</p>
         <p v-if="room.treasure" class="cyan-phosphor">💎 {{ room.treasure }}</p>
       </div>
-      <div class="border border-surface-600 bg-surface-800 p-2 h-20 overflow-y-auto text-xs space-y-0.5">
-        <p v-for="(m, i) in log" :key="i" :class="i === log.length - 1 ? 'text-amber' : 'text-ink-dim'">{{ m }}</p>
-      </div>
+      <GameLog :entries="log" class="border border-surface-600 bg-surface-800 p-2 h-20 text-xs space-y-0.5" />
       <div v-if="stage === 3" class="grid grid-cols-2 gap-1">
         <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-1.5" @click="move('n')">↑ N</button>
         <button class="arcade-btn-ghost border border-surface-600 text-[10px] py-1.5" @click="move('s')">↓ S</button>
